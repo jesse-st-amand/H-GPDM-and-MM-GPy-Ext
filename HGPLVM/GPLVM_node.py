@@ -87,7 +87,7 @@ def GPLVM_node(Y, attr_dict, **kwargs):
             elif embed_type.lower() == 'BC'.lower():
                 return self.backconstraint.f()
             elif embed_type.lower() == 'random projections':
-                from initializers import random_projections
+                from HGPLVM.initializers import random_projections
                 X = random_projections(Y,input_dim)
             elif embed_type.lower() == 'random'.lower():
                 local_random = np.random.RandomState()
@@ -137,49 +137,49 @@ def GPLVM_node(Y, attr_dict, **kwargs):
                 embedding = LocallyLinearEmbedding(n_neighbors=param, n_components=input_dim, method=param)
                 X = embedding.fit_transform(Y)
             elif embed_type.lower() == 'FFT_2D'.lower():
-                from initializers import FFT_2D
+                from HGPLVM.initializers import FFT_2D
                 X = FFT_2D(Y, input_dim, self.num_seqs)
             elif embed_type.lower() == 'FFT_3D'.lower():
-                from initializers import FFT_3D
+                from HGPLVM.initializers import FFT_3D
                 X = FFT_3D(Y, input_dim, self.num_seqs)
             elif embed_type.lower() == 'lines'.lower():
-                from initializers import lines
+                from HGPLVM.initializers import lines
                 X = lines(Y.shape[0], input_dim)
             elif embed_type.lower() == 'random_sine_waves'.lower():
-                from initializers import random_sine_waves
+                from HGPLVM.initializers import random_sine_waves
                 X = random_sine_waves(Y.shape[0], input_dim)
             elif embed_type.lower() == 'sine_waves'.lower():
-                from initializers import sine_waves
+                from HGPLVM.initializers import sine_waves
                 X = sine_waves(Y.shape[0], input_dim)
             elif embed_type.lower() == 'fourier_basis'.lower():
-                from initializers import fourier_basis
+                from HGPLVM.initializers import fourier_basis
                 X = fourier_basis(Y.shape[0], input_dim, per_seq = param, num_seqs = self.num_seqs)
             elif embed_type.lower() == 'wavelet_basis'.lower():
-                from initializers import wavelet_basis
+                from HGPLVM.initializers import wavelet_basis
                 X = wavelet_basis(Y.shape[0], input_dim, per_seq = param, num_seqs = self.num_seqs)
             elif embed_type.lower() == 'legendre_basis'.lower():
-                from initializers import legendre_basis
+                from HGPLVM.initializers import legendre_basis
                 X = legendre_basis(Y.shape[0], input_dim, per_seq = param, num_seqs = self.num_seqs)
             elif embed_type.lower() == 'hermite_basis'.lower():
-                from initializers import hermite_basis
+                from HGPLVM.initializers import hermite_basis
                 X = hermite_basis(Y.shape[0], input_dim, per_seq = param, num_seqs = self.num_seqs)
             elif embed_type.lower() == 'laguerre_basis'.lower():
-                from initializers import laguerre_basis
+                from HGPLVM.initializers import laguerre_basis
                 X = laguerre_basis(Y.shape[0], input_dim, per_seq = param, num_seqs = self.num_seqs)
             elif embed_type.lower() == 'chebyshev_basis'.lower():
-                from initializers import chebyshev_basis
+                from HGPLVM.initializers import chebyshev_basis
                 X = chebyshev_basis(Y.shape[0], input_dim, per_seq = param, num_seqs = self.num_seqs)
             elif embed_type.lower() == 'zernike_basis'.lower():
-                from initializers import zernike_basis
+                from HGPLVM.initializers import zernike_basis
                 X = zernike_basis(Y.shape[0], input_dim, per_seq = param, num_seqs = self.num_seqs)
             elif embed_type.lower() == 'spherical_harmonics_basis'.lower():
-                from initializers import spherical_harmonics_basis
+                from HGPLVM.initializers import spherical_harmonics_basis
                 X = spherical_harmonics_basis(Y.shape[0], input_dim, per_seq = param, num_seqs = self.num_seqs)
             elif embed_type.lower() == 'haar_basis'.lower():
-                from initializers import haar_basis
+                from HGPLVM.initializers import haar_basis
                 X = haar_basis(Y.shape[0], input_dim, per_seq = param, num_seqs = self.num_seqs)
             elif embed_type.lower() == 'walsh_basis'.lower():
-                from initializers import walsh_basis
+                from HGPLVM.initializers import walsh_basis
                 X = walsh_basis(Y.shape[0], input_dim, per_seq = param, num_seqs = self.num_seqs)
             else:
                 print('Initialization method not recognized. Defaulted to PCA')

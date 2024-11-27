@@ -133,6 +133,9 @@ class External_Model_Base(Architecture_Base):
             start = time.time()
         return start
 
+    def count_parameters(self):
+        return sum(p.numel() for p in self.parameters() if p.requires_grad)
+
 
 class VAEMotionModel(nn.Module, External_Model_Base):
     def __init__(self, wrapper, data_set_class, sample_len, input_size, num_classes, hidden_size=256, latent_size=32, subseq_len=10):
@@ -183,6 +186,8 @@ class VAEMotionModel(nn.Module, External_Model_Base):
             self.device = torch.device('cpu')
             print('CUDA not available. CPU enabled')
         self.to(self.device)
+
+        print(f"VAE model parameters: {self.count_parameters()}")
 
     def encode(self, x):
         x = x.to(self.device)
@@ -552,6 +557,18 @@ class TransformerMotionModel(nn.Module, External_Model_Base):
         self.to(self.device)
         print(f"Model initialized on device: {self.device}")  # Debug line
 
+        print(f"Transformer model parameters: {self.count_parameters()}")
+
+    def count_parameters(self):
+        # Count parameters in the transformer
+        transformer_params = self.transformer.num_parameters()
+
+        # Count parameters in other parts of the model
+        other_params = sum(p.numel() for name, p in self.named_parameters()
+                           if 'transformer' not in name and p.requires_grad)
+
+        return transformer_params + other_params
+
     def forward(self, x, attention_mask=None):
         x = x.to(self.device)
         batch_size = x.size(0)
@@ -683,6 +700,8 @@ class SequenceClassifier(nn.Module, External_Model_Base):
             self.device = torch.device('cpu')
             print('CUDA not available. CPU enabled')
         self.to(self.device)
+
+        print(f"LSTM model parameters: {self.count_parameters()}")
 
     def forward(self, x, predict_length=None):
         x = x.to(self.device)

@@ -1,5 +1,8 @@
 
 import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import psutil
 import pickle
 from joblib import Parallel, delayed
@@ -72,10 +75,9 @@ if __name__ == "__main__":
     current_directory = os.path.dirname(os.path.abspath(__file__))
     parent_directory = os.path.dirname(current_directory)
 
-    param_dir = 'testing'
+    param_dir = 'MCCV'
     names = [
-        'GPDM_params_Bayesian_BM_50_singular'
-        #'GPDM_MCCV_BM_50_singular',
+        'GPDM_MCCV_BM_IC_testing',
         #'RNN_MCCV_BM',
         #'VAE_MCCV_BM',
         #'transformer_MCCV_BM',

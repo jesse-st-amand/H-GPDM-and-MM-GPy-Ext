@@ -3,8 +3,6 @@
 /DSCs/data/
 /HGPLVM/model_results_processing/
 
-
-# It's generally a good idea to also ignore common Python-related files:
 *.pyc
 __pycache__/
 *.pyo

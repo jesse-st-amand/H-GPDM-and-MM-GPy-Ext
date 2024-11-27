@@ -2,7 +2,6 @@ import os
 import shutil
 import datetime
 from compile_data_funcs import main as compile_main
-
 def unpack_directory(source_dir):
     print(f"Attempting to unpack directory: {source_dir}")
     if not os.path.exists(source_dir):
@@ -35,7 +34,9 @@ def unpack_directory(source_dir):
     return copy_dir
 
 def process_model(model_name, grouping_params):
-    base_path = r'C:\Users\Jesse\Documents\Python\GPy\HGPLVM_output_repository\model_summaries'
+    base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+    base_path = base_dir+r'\HGPLVM_output_repository\model_summaries'
 
     print(f"Processing model: {model_name}")
     print(f"Importing parameters from: model_comparison_core.model_parameters.{model_name}")
@@ -66,7 +67,7 @@ def process_model(model_name, grouping_params):
 
     # Output directory
     output_base = os.path.abspath(
-        r'C:\Users\Jesse\Documents\Python\GPy\HGPLVM_output_repository\compiled_model_summaries')
+        base_dir+r'\HGPLVM_output_repository\compiled_model_summaries')
     output_path = os.path.join(output_base, os.path.basename(unpacked_dir))
 
     print(f"Creating output directory: {output_path}")

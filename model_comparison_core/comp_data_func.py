@@ -170,13 +170,7 @@ def comp_func(data_set_class,  model_dict, seed=0, dict_index=0, fold_num=0, sav
         'f1': model.arch.f1_list,
         'msad': model.arch.msad_list
     }
-    """filename = ''
-    for key in space_dict.keys():
-        key_name = ''.join([k[0] for k in key.split(':')[-1].split('_')])
-        dict_val = str(space_dict[key])
-        filename += key_name + '_' + dict_val + '_'
-    filename = filename[:-1]  # Remove the trailing underscore
-    save_path = os.path.join(dir_path, filename).replace('\\', '/')"""
+
 
     save_optimization_result(result, new_model_dict, data_set_class.__dict__, save_path, dict_index, fold_num,
                              space_dict)
@@ -186,31 +180,6 @@ def comp_func(data_set_class,  model_dict, seed=0, dict_index=0, fold_num=0, sav
     else:
         return score
 
-
-'''def data_func(data_set_class_dict,fold_num=0, seed=0, space_dict=None, **kwargs):
-    np.random.seed(int(seed))
-    random.seed(int(seed))
-    print('seed: ' + str(int(seed)))
-    new_dict = create_embedded_dict_from_space_dict_colon_paths_with_mixed_values(space_dict)
-    new_data_set_class_dict = copy.deepcopy(merge_dicts(data_set_class_dict, new_dict))
-
-    if new_data_set_class_dict['data_set_name'] == 'Bimanual 3D':
-        num_seqs_per_action = 10
-        data_set_class = Bimanual3D(new_data_set_class_dict['seq_len'], num_seqs_per_action,
-                                    num_folds=new_data_set_class_dict['num_folds'],
-                                    fold_num=fold_num)
-    elif new_data_set_class_dict['data_set_name'] == 'Movements CMU':
-        num_seqs_per_action = 6
-        data_set_class = MovementsCMU(new_data_set_class_dict['seq_len'], num_seqs_per_action,
-                                      num_folds=new_data_set_class_dict['num_folds'],
-                                      fold_num=fold_num)
-
-    data_set_class.get_data_set(new_data_set_class_dict, new_data_set_class_dict['seq_len'],
-                                new_data_set_class_dict['actions'], new_data_set_class_dict['people'],
-                                new_data_set_class_dict['num_sequences_per_action_train'],
-                                new_data_set_class_dict['num_sequences_per_action_test'])
-
-    return data_set_class'''
 
 def data_func(data_set_class_dict, fold_num=0, seed=0, space_dict=None, **kwargs):
     return load_mccv_data(data_set_class_dict['data_set_name'], fold_num)

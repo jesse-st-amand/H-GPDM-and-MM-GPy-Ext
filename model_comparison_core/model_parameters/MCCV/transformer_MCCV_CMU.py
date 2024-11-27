@@ -38,10 +38,10 @@ output_dir_name = 'MCCV_f1_dist_msad_'+data_set_name+'_Bayesian_Transformer'
 #space.append(Integer(2,4,name='arch_dict:num_layers'))
 #space.append(Integer(8,13,name='arch_dict:num_heads'))
 
-num_epochs = 75
+num_epochs = 20#100
 num_folds = 50
 fold_start = 0
-fold_end = 50
+fold_end = 2#50 --FIX
 fold_list = list(np.arange(fold_start,fold_end,1))
 fold_num = tuple(fold_list)
 scoring_method = 'f1_dist_msad:ff'

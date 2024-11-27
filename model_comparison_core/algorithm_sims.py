@@ -135,7 +135,7 @@ class func_simulator():
 
     def sim_func(self, *args, **kwargs):
         if self.space is None:
-            data_set_class = self.data_func(fold_num = kwargs['dict_index'],**kwargs)
+            data_set_class = self.data_func(fold_num = kwargs['data_set_class_dict']['fold_num'],**kwargs)
             return self.comp_func(data_set_class, *args, save_path = kwargs['dir_path'], **kwargs)
 
         else:

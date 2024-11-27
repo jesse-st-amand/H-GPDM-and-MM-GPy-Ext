@@ -30,10 +30,10 @@ output_dir_name = 'MCCV_f1_dist_msad_'+data_set_name+'_Bayesian_RNN'
 #space.append(Integer(100,125,name='arch_dict:hidden_size'))
 #space.append(Integer(3,4,name='arch_dict:num_layers'))
 
-num_epochs = 250
+num_epochs = 20#100
 num_folds = 50
 fold_start = 0
-fold_end = 50
+fold_end = 2#50 --FIX
 fold_list = list(np.arange(fold_start,fold_end,1))
 fold_num = tuple(fold_list)
 scoring_method = 'f1_dist_msad:ff'
