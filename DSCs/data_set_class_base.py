@@ -11,12 +11,9 @@ from scipy.spatial.distance import euclidean
 from fastdtw import fastdtw
 from sklearn.metrics import confusion_matrix
 import seaborn as sns
-import numpy as np
 from sklearn.metrics import f1_score
 from frechetdist import frdist
 import os
-from sklearn.metrics import f1_score
-from scipy.spatial.distance import euclidean
 class DataSetClassBase:
     def __init__(self, name):
         self.name = name
@@ -487,8 +484,6 @@ class DataSetClassMovementBase(DataSetClassSequencesBase):
         else:
             return score
 
-    def near_zero(self, arr, tolerance=1e-5):
-        return any(abs(x) < tolerance for x in arr)
 
     def score_value_dynamic(self, x_g, x_p, ID_g=0, ID_p=None, ID_p_g=0, pred_probs=[]):
         if np.array_equal(x_g, x_p):
@@ -521,7 +516,7 @@ class DataSetClassMovementBase(DataSetClassSequencesBase):
             elif (ID_p_g == ID_p and ID_p_g == ID_g) or (ID_p_g != ID_p and ID_p_g == ID_g):
                 return dist
             elif ID_p_g != ID_p and ID_p_g != ID_g and ID_p == ID_g:
-                return dist  # * pred_probs[ID_p] (commented out as in original)
+                return dist  
             else:
                 return 0
         else:
@@ -529,148 +524,6 @@ class DataSetClassMovementBase(DataSetClassSequencesBase):
                 return dist
             else:
                 return 0
-
-    import numpy as np
-    from fastdtw import fastdtw
-    from scipy.spatial.distance import euclidean
-    from sklearn.metrics import f1_score
-
-    '''def score_joint_angles(self, sample_len, true_sequences, pred_sequences, true_labels, pred_labels,
-                           distance_metric='dtw'):
-        def calculate_distance(s1, s2):
-            if distance_metric == 'dtw':
-                distance, _ = fastdtw(s1, s2, dist=euclidean)
-                return distance
-            elif distance_metric == 'frechet':
-                return frdist(s1, s2)
-            elif distance_metric == 'dtw_mse':
-                # Apply fastDTW to align sequences, then calculate MSE
-                _, path = fastdtw(s1, s2, dist=euclidean)
-
-                # Use the path to align sequences
-                s1_aligned = np.array([s1[p[0]] for p in path])
-                s2_aligned = np.array([s2[p[1]] for p in path])
-
-                # Calculate MSE
-                mse = np.mean(np.sum((s1_aligned - s2_aligned) ** 2, axis=1))
-
-                return mse
-            elif distance_metric == 'mse':
-                # Ensure sequences are the same length
-                min_len = min(len(s1), len(s2))
-                s1 = s1[:min_len]
-                s2 = s2[:min_len]
-
-                # Calculate MSE
-                mse = np.mean(np.sum((s1 - s2) ** 2, axis=1))
-
-                return mse
-            else:
-                raise ValueError("Invalid distance metric. Choose 'dtw', 'frechet', 'dtw_mse', or 'mse'.")
-
-        # Calculate F1 score
-        f1 = f1_score(true_labels, pred_labels, average='weighted')
-        if f1 == 0:
-            print('Model failed to classify any sequence correctly.')
-            return {'f1': 0, 'avg_norm_distance': 1000000, 'avg_norm_msad': 1000000,
-                    'avg_norm_velocity_distance': 1000000, 'avg_norm_freeze_distance': 1000000,
-                    'avg_true_velocity_variance': 1000000, 'avg_true_velocity_mean': 1000000,
-                    'avg_pred_velocity_variance': 1000000, 'avg_pred_velocity_mean': 1000000}
-
-        # Initialize variables for all metrics
-        total_norm_distance = 0
-        total_norm_msad = 0
-        total_norm_velocity_distance = 0
-        total_norm_freeze_distance = 0
-        total_true_velocity_variance = 0
-        total_true_velocity_mean = 0
-        total_pred_velocity_variance = 0
-        total_pred_velocity_mean = 0
-        total_correct_sequences = 0
-
-        unique_classes = np.unique(true_labels)
-        num_classes = len(unique_classes)
-        for c in unique_classes:
-            class_mask_true = (true_labels == c)
-            class_mask = (true_labels == c) & (pred_labels == c)
-            class_pred_seq = [pred_sequences[i] for i in range(len(pred_sequences)) if class_mask[i]]
-            class_true_seq = [true_sequences[i] for i in range(len(true_sequences)) if class_mask[i]]
-            class_ground_seq = [true_sequences[i] for i in range(len(true_sequences)) if class_mask_true[i]]
-            if len(class_pred_seq) == 0:
-                #num_classes -= 1
-                continue  # No correctly classified sequences for this class
-
-            # Compute max distance among all true sequences of the class
-            if len(class_ground_seq) < 2:
-                max_distance = max_msad = max_velocity_distance = 1  # Default values if not enough sequences
-            else:
-                max_distance = max(calculate_distance(s[sample_len:, :], t[sample_len:, :])
-                                   for i, s in enumerate(class_ground_seq) for t in class_ground_seq[i + 1:])
-                max_msad = max(self.calculate_msad(s[sample_len:, :], t[sample_len:, :])
-                               for i, s in enumerate(class_ground_seq) for t in class_ground_seq[i + 1:])
-                max_velocity_distance = max(calculate_distance(np.diff(s[sample_len:, :], axis=0),
-                                                               np.diff(t[sample_len:, :], axis=0))
-                                            for i, s in enumerate(class_ground_seq) for t in class_ground_seq[i + 1:])
-
-            # Avoid division by zero
-            max_distance = max(max_distance, 1)
-            max_msad = max(max_msad, 1)
-            max_velocity_distance = max(max_velocity_distance, 1)
-
-            class_sum_distance = sum(calculate_distance(p[sample_len:, :], t[sample_len:, :]) / max_distance
-                                     for p, t in zip(class_pred_seq, class_true_seq))
-            total_norm_distance += class_sum_distance
-
-            class_sum_msad = sum(self.calculate_msad(p[sample_len:, :], t[sample_len:, :]) / max_msad
-                                 for p, t in zip(class_pred_seq, class_true_seq))
-            total_norm_msad += class_sum_msad
-
-            class_sum_velocity_distance = sum(calculate_distance(np.diff(p[sample_len:, :], axis=0),
-                                                                 np.diff(t[sample_len:, :],
-                                                                         axis=0)) / max_velocity_distance
-                                              for p, t in zip(class_pred_seq, class_true_seq))
-            total_norm_velocity_distance += class_sum_velocity_distance
-
-            zero_velocity = np.zeros_like(np.diff(class_pred_seq[0][sample_len:, :], axis=0))
-            class_sum_freeze_distance = sum(calculate_distance(np.diff(p[sample_len:, :], axis=0),
-                                                               zero_velocity) / max_velocity_distance
-                                            for p in class_pred_seq)
-            total_norm_freeze_distance += class_sum_freeze_distance
-
-            # Calculate velocity metrics
-            for t, p in zip(class_true_seq, class_pred_seq):
-                t_velocity = np.diff(t[sample_len:, :], axis=0)
-                p_velocity = np.diff(p[sample_len:, :], axis=0)
-
-                total_true_velocity_variance += np.var(t_velocity)
-                total_true_velocity_mean += np.mean(np.abs(t_velocity))
-                total_pred_velocity_variance += np.var(p_velocity)
-                total_pred_velocity_mean += np.mean(np.abs(p_velocity))
-
-            total_correct_sequences += len(class_pred_seq)
-
-        if total_correct_sequences == 0:
-            return {'f1': f1, 'avg_norm_distance': 1000000, 'avg_norm_msad': 1000000,
-                    'avg_norm_velocity_distance': 1000000, 'avg_norm_freeze_distance': 1000000,
-                    'avg_true_velocity_variance': 1000000, 'avg_true_velocity_mean': 1000000,
-                    'avg_pred_velocity_variance': 1000000, 'avg_pred_velocity_mean': 1000000}
-
-        avg_norm_distance = total_norm_distance / total_correct_sequences / num_classes
-        avg_norm_msad = total_norm_msad / total_correct_sequences / num_classes
-        avg_norm_velocity_distance = total_norm_velocity_distance / total_correct_sequences / num_classes
-        avg_norm_freeze_distance = total_norm_freeze_distance / total_correct_sequences / num_classes
-        avg_true_velocity_variance = total_true_velocity_variance / total_correct_sequences / num_classes
-        avg_true_velocity_mean = total_true_velocity_mean / total_correct_sequences / num_classes
-        avg_pred_velocity_variance = total_pred_velocity_variance / total_correct_sequences / num_classes
-        avg_pred_velocity_mean = total_pred_velocity_mean / total_correct_sequences / num_classes
-
-        return {'f1': f1, 'avg_norm_distance': avg_norm_distance, 'avg_norm_msad': avg_norm_msad,
-                'avg_norm_velocity_distance': avg_norm_velocity_distance,
-                'avg_norm_freeze_distance': avg_norm_freeze_distance,
-                'avg_true_velocity_variance': avg_true_velocity_variance,
-                'avg_true_velocity_mean': avg_true_velocity_mean,
-                'avg_pred_velocity_variance': avg_pred_velocity_variance,
-                'avg_pred_velocity_mean': avg_pred_velocity_mean}'''
 
     def score_f1_dist_msad(self, sample_len, true_sequences, pred_sequences, true_labels, pred_labels,
                            distance_metric='frechet'):
@@ -746,6 +599,7 @@ class DataSetClassMovementBase(DataSetClassSequencesBase):
         avg_norm_msad = total_norm_msad / total_correct_sequences / num_classes
 
         return {'f1': f1, 'avg_norm_distance': avg_norm_distance, 'avg_norm_msad': avg_norm_msad}
+    
     def calculate_msad(self, pred_sequence, true_sequence):
         # Calculate acceleration for both sequences
         pred_acc = np.diff(pred_sequence, n=2, axis=0)
@@ -755,49 +609,7 @@ class DataSetClassMovementBase(DataSetClassSequencesBase):
         msad = np.mean(np.square(pred_acc - true_acc))
 
         return msad
-
-    '''def score_joint_angles(self, true_sequences, pred_sequences, true_labels, pred_labels):
-        # Calculate F1 score
-        f1 = f1_score(true_labels, pred_labels, average='weighted')
-
-        # Calculate average normalized Fréchet distance
-        unique_classes = np.unique(true_labels)
-        if len(unique_classes) == 0:
-            return 0, float('inf')
-
-        total_norm_frechet = 0
-        correctly_classified_classes = 0
-
-        for c in unique_classes:
-            class_mask = (true_labels == c) & (pred_labels == c)
-            class_pred_seq = [pred_sequences[i] for i in range(len(pred_sequences)) if class_mask[i]]
-            class_true_seq = [true_sequences[i] for i in range(len(true_sequences)) if class_mask[i]]
-
-            class_mask_true = (true_labels == c)
-            all_true_seq = [true_sequences[i] for i in range(len(true_sequences)) if class_mask_true[i]]
-
-            if len(all_true_seq) < 2:
-                continue  # Skip classes with less than 2 true samples
-
-            max_frechet = max(frdist(s, t) for i, s in enumerate(all_true_seq) for t in all_true_seq[i + 1:])
-
-            if max_frechet == 0:
-                continue  # Skip classes where all sequences are identical
-
-            if len(class_pred_seq) == 0:
-                # If no correct classifications, use the maximum possible Fréchet distance for this class
-                total_norm_frechet += len(all_true_seq)  # Assuming worst case: each prediction is as bad as max_frechet
-            else:
-                correctly_classified_classes += 1
-                class_sum = sum(frdist(p, t) / max_frechet for p, t in zip(class_pred_seq, class_true_seq))
-                total_norm_frechet += class_sum
-
-          # Return infinity if there are no classes to evaluate
-
-        avg_norm_frechet = total_norm_frechet / len(unique_classes)
-
-        return f1, avg_norm_frechet'''
-
+    
     def get_joint_angles(self, Y_SD):
         """
         Extract joint angles from Y_SD.

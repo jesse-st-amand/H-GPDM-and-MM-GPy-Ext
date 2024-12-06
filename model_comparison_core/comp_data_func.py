@@ -128,9 +128,9 @@ def end_path_key_value(path_dict, writer, exclude_keys = []):
 def generate_filename(dir_path, comp_dict, dict_index, sim_index):
     return os.path.join(dir_path,
         f"{comp_dict['attr_dict']['model_type'].replace(' ', '_')}_"
-        f"{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}_dict_{dict_index}_sim_{sim_index}.csv")
+        f"{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}_dict_{dict_index}_fold_{sim_index}.csv")
 
-def comp_func(data_set_class,  model_dict, seed=0, dict_index=0, fold_num=0, save_path='', space_dict=None, return_model = False, **kwargs):
+def comp_func(data_set_class,  model_dict, seed=0, dict_index=0, fold_num=1, save_path='', space_dict=None, return_model = False, **kwargs):
     np.random.seed(int(seed))
     random.seed(int(seed))
     new_dict = create_embedded_dict_from_space_dict_colon_paths_with_mixed_values(space_dict)

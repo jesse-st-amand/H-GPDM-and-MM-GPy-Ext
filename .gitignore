@@ -1,7 +1,6 @@
 # Ignore graphics directory inside HGPLVM
 /DSCs/graphics/npy/
 /DSCs/data/
-/HGPLVM/model_results_processing/
 
 *.pyc
 __pycache__/

@@ -41,7 +41,7 @@ seq_len = 100
 ## ---------------------------------------------------------------------------------------------------------------------
 people = [0]
 input_dim = 24
-output_dir_name = 'GPDMM_testing_inits'+'_MCCV_f1_dist_msad_'+data_set_name
+output_dir_name = 'GPDMM_testing_inits'+'_MCCV_f1_dist_msad_'+data_set_name+'_extra'
 #space.append(Integer(19,30,name='arch_dict:top_node_dict:attr_dict:input_dim'))
 max_iters = 100
 num_folds = 50
@@ -55,9 +55,10 @@ score_rate = int(max_iters*.1)
 
 
 
-init1 = ('fourier_basis','random', 'legendre_basis','lines','random_sine_waves','sine_waves','chebyshev_basis','zernike_basis',
+'''init1 = ('fourier_basis','random', 'legendre_basis','lines','random_sine_waves','sine_waves','chebyshev_basis','zernike_basis',
          'spherical_harmonics_basis','walsh_basis','laguerre_basis','PCA','kernel pca:rbf','isomap:15',
-         'umap:cosine', 'umap:euclidean','random projections', 'FFT_2D', 'FFT_3D')
+         'umap:cosine', 'umap:euclidean','random projections', 'FFT_2D', 'FFT_3D')'''
+init1 = ('umap:cosine', 'umap:euclidean','random_sine_waves')
 bc_name = 'map'
 geometry = 'none'
 order = 2

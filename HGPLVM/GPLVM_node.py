@@ -125,7 +125,7 @@ def GPLVM_node(Y, attr_dict, **kwargs):
                 X = transformer.fit_transform(Y)
                 X = np.append(X, Y[:, 117:], axis=1)
             elif embed_type.lower() == 'umap':
-                import umap
+                import umap.umap_ as umap
                 transformer = umap.UMAP(n_neighbors=10, n_components=input_dim, metric=param)
                 X = transformer.fit_transform(Y)
             elif embed_type.lower() == 'isomap'.lower():

@@ -136,7 +136,7 @@ class func_simulator():
     def sim_func(self, *args, **kwargs):
         if self.space is None:
             data_set_class = self.data_func(fold_num = kwargs['data_set_class_dict']['fold_num'],**kwargs)
-            return self.comp_func(data_set_class, *args, save_path = kwargs['dir_path'], **kwargs)
+            return self.comp_func(data_set_class, *args, save_path = kwargs['dir_path'], fold_num = kwargs['data_set_class_dict']['fold_num'], **kwargs)
 
         else:
             from skopt import gp_minimize
@@ -167,7 +167,7 @@ class func_simulator():
     def set_obj_func(self, func):
         self.obj_func = func
 
-    def parallelize_funcs(self, func, func_args, seeds,return_model = False):
+    def parallelize_funcs(self, func, func_args, seeds, return_model = False):
         import multiprocessing
         from joblib import Parallel, delayed, dump
         param_combinations = list(
@@ -211,6 +211,6 @@ class func_simulator():
         variable_args_dict['dict_index'] = dict_index
         variable_args_dict['dir_path'] = dir_path
         if self.parallelize:
-            return self.parallelize_funcs(partial_sim_func, variable_args_dict, seeds,return_model = return_model)
+            return self.parallelize_funcs(partial_sim_func, variable_args_dict, seeds, return_model = return_model)
         else:
-            return self.serialize_funcs(partial_sim_func, variable_args_dict, seeds,return_model = return_model)
+            return self.serialize_funcs(partial_sim_func, variable_args_dict, seeds, return_model = return_model)

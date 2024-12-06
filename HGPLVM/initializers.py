@@ -198,7 +198,7 @@ def random_sine_waves(N, D):
 
     for d in range(D):
         # Randomize parameters for each sine wave using our RandomState object
-        amplitude = rng.uniform(0.5, 2.0)
+        amplitude = rng.uniform(0.1, 2.0)
         frequency = rng.uniform(0.1, 2.0)
         phase_shift = rng.uniform(0, 2 * np.pi)
 
