@@ -5,7 +5,7 @@ from scipy.interpolate import interp1d
 import os
 import sys
 from sparc import sparc, log_dimensionless_jerk
-from DSCs.evaluation_metrics import score_sequences, calculate_smoothness_metric, calculate_smoothness_singular
+from DSCs.evaluation_metrics import score_f1_dist_smoothness, calculate_smoothness_metric, calculate_smoothness_singular
 # Add the project root directory to the Python path
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(project_root)
@@ -40,7 +40,7 @@ def test_score_joint_angles():
         return np.concatenate([seq[:freeze_index], frozen_part])
 
     # Generate ground truth sequences
-    num_sequences = 5
+    num_sequences = 12
     sequence_length = 100
     num_features = 3
     true_sequences = generate_sequences(num_sequences, sequence_length, num_features)
@@ -48,7 +48,7 @@ def test_score_joint_angles():
 
     # Generate prediction set 1 (pset1): warped and noisy
     #pset1 = [warp_sequence(seq) for seq in true_sequences]
-    pset1 = [seq for seq in true_sequences]
+    pset1 = [add_noise(seq,.1) for seq in true_sequences]
 
     # Generate prediction set 2 (pset2): same as pset1 but with freezing
     pset2 = [add_noise(seq,1) for seq in pset1]
@@ -60,11 +60,11 @@ def test_score_joint_angles():
     pred_labels1[misclassify_indices] = (pred_labels1[misclassify_indices] + 1) % 3
     pred_labels2[misclassify_indices] = (pred_labels2[misclassify_indices] + 1) % 3
 
-    smoothness_metric = 'sparc'
+    smoothness_metric = 'ldj'
     # Run the tests
-    sample_len = 10  # Adjust as needed
-    result1 = score_sequences(sample_len, true_sequences, pset1, true_labels, pred_labels1, smoothness_metric=smoothness_metric)
-    result2 = score_sequences(sample_len, true_sequences, pset2, true_labels, pred_labels2, smoothness_metric=smoothness_metric)
+    sample_len = 50  # Adjust as needed
+    result1 = score_f1_dist_smoothness(sample_len, true_sequences, pset1, true_labels, pred_labels1, smoothness_metric=smoothness_metric)
+    result2 = score_f1_dist_smoothness(sample_len, pset1, pset2, true_labels, pred_labels2, smoothness_metric=smoothness_metric)
 
     
 

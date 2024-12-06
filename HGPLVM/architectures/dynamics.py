@@ -62,7 +62,7 @@ class DynamicsBase:
         self.arch.pred_classes.append({'pred':self.arch.data_set_class.results_dict['pred_trajs'],'gt':self.arch.data_set_class.action_IDs_test})
         self.arch.f1_list.append(scores['f1'])
         self.arch.score_list.append(scores['avg_norm_distance'])
-        self.arch.msad_list.append(scores['avg_norm_msad'])
+        self.arch.smoothness_list.append(scores['avg_norm_smoothness'])
         self.arch.iter_list.append(self.arch.model.learning_n)
         self.arch.loss_list.append(self.arch.model.ObjFunVal)
         print('')
@@ -71,8 +71,8 @@ class DynamicsBase:
         print(scores['avg_norm_distance'])
         print('f1: ')
         print(scores['f1'])
-        print('avg_norm_msad: ')
-        print(scores['avg_norm_msad'])
+        print('avg_norm_smoothness: ')
+        print(scores['avg_norm_smoothness'])
 
         if scores['f1'] == 0:
             f1_score = 0.01

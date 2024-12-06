@@ -111,10 +111,10 @@ def write_results_to_csv(filename, result, comp_dict, data_dict, space_dict=None
         writer.writerow([])
 
         # Write second table
-        writer.writerow(['iteration', 'score', "loss", 'predicted classes', 'f1', 'msad'])
-        for i, (score, iter, loss, pc, f1, msad) in enumerate(zip(result['fun'], result['iter'], result['loss'],
-                                                    result['pred_classes'], result['f1'], result['msad'])):
-            writer.writerow([str(iter), score, loss, pc, f1, msad])
+        writer.writerow(['iteration', 'score', "loss", 'predicted classes', 'f1', 'smoothness'])
+        for i, (score, iter, loss, pc, f1, smoothness) in enumerate(zip(result['fun'], result['iter'], result['loss'],
+                                                    result['pred_classes'], result['f1'], result['smoothness'])):
+            writer.writerow([str(iter), score, loss, pc, f1, smoothness])
 def end_path_key_value(path_dict, writer, exclude_keys = []):
     if path_dict is None:
         return
@@ -168,7 +168,7 @@ def comp_func(data_set_class,  model_dict, seed=0, dict_index=0, fold_num=1, sav
         'loss': model.arch.loss_list,
         'pred_classes': model.arch.pred_classes,
         'f1': model.arch.f1_list,
-        'msad': model.arch.msad_list
+        'smoothness': model.arch.smoothness_list
     }
 
 

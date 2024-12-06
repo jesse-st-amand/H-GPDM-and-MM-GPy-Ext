@@ -4,7 +4,6 @@ from fastdtw import fastdtw
 from frechetdist import frdist
 from scipy.spatial.distance import euclidean
 from sparc import sparc, log_dimensionless_jerk
-from sparc import gaussian_discrete_movement, generate_movement
 
 def calculate_distance(s1, s2, distance_metric='frechet'):
     if distance_metric == 'dtw':
@@ -30,7 +29,7 @@ def calculate_distance(s1, s2, distance_metric='frechet'):
         raise ValueError("Invalid distance metric. Choose 'dtw', 'frechet', 'dtw_mse', or 'mse'.")
 
 
-def score_sequences(sample_len, true_sequences, pred_sequences, true_labels, pred_labels,
+def score_f1_dist_smoothness(sample_len, true_sequences, pred_sequences, true_labels, pred_labels,
                            distance_metric='frechet', smoothness_metric='ldj'):
         
         # Calculate F1 score
@@ -62,8 +61,9 @@ def score_sequences(sample_len, true_sequences, pred_sequences, true_labels, pre
             else:
                 max_distance = max(calculate_distance(s[sample_len:, :], t[sample_len:, :], distance_metric)
                                    for i, s in enumerate(class_ground_seq) for t in class_ground_seq[i + 1:])
-                max_smoothness = max(calculate_smoothness_metric(s[sample_len:, :], t[sample_len:, :], smoothness_metric)
+                max_smoothness = max(abs(calculate_smoothness_metric(s[sample_len:, :], t[sample_len:, :], smoothness_metric))
                                for i, s in enumerate(class_ground_seq) for t in class_ground_seq[i + 1:])
+
 
 
             class_sum_distance = sum(calculate_distance(p[sample_len:, :], t[sample_len:, :], distance_metric) / max_distance
@@ -72,10 +72,6 @@ def score_sequences(sample_len, true_sequences, pred_sequences, true_labels, pre
 
             class_sum_smoothness = sum(calculate_smoothness_metric(p[sample_len:, :], t[sample_len:, :], smoothness_metric) / max_smoothness
                                  for p, t in zip(class_pred_seq, class_true_seq))
-            
-            total_norm_smoothness += class_sum_smoothness
-
-            total_correct_sequences += len(class_pred_seq)
 
         if total_correct_sequences == 0:
             return {'f1': f1, 'avg_norm_distance': 1000000, 'avg_norm_smoothness': 1000000}
@@ -132,56 +128,3 @@ def calculate_smoothness_singular(s1, smoothness_metric='sparc', fs=100, padleve
         smoothness_diffs.append(score)
     
     return np.mean(smoothness_diffs)
-
-'''def spectral_arc_length(position_data: np.ndarray, fs: float = 100, cut_off: float = 20) -> float:
-    """
-    Calculate the spectral arc length metric for smoothness from position data.
-    
-    Args:
-        position_data: numpy array of shape (n_samples, n_dimensions) containing position data
-        fs: sampling frequency in Hz (default 100 Hz)
-        cut_off: cut-off frequency in Hz (default 20 Hz)
-    
-    Returns:
-        float: Spectral arc length metric (a negative value, with values closer to 0 indicating smoother movement)
-    """
-    # For each dimension, compute velocity then SAL and take the mean
-    sal_values = []
-    for d in range(position_data.shape[1]):
-        # Compute velocity using central differences
-        velocity = np.gradient(position_data[:, d], 1/fs)
-        
-        # Compute FFT and frequencies
-        n_fft = next_power_of_2(len(velocity))
-        freqs = np.fft.fftfreq(n_fft, d=1/fs)
-        
-        # Compute Fourier transform
-        spectrum = np.fft.fft(velocity, n=n_fft)
-        magnitude_spectrum = np.abs(spectrum)
-        
-        # Only keep positive frequencies up to cut-off
-        positive_freqs = freqs[freqs >= 0]
-        positive_spectrum = magnitude_spectrum[freqs >= 0]
-        mask = positive_freqs <= cut_off
-        freqs_masked = positive_freqs[mask]
-        spectrum_masked = positive_spectrum[mask]
-        
-        # Normalize the spectrum
-        spectrum_normalized = spectrum_masked #/ np.max(np.abs(spectrum_masked))
-        
-        # Calculate the spectral arc length
-        gradients = np.gradient(spectrum_normalized)
-        freqs_normalized = freqs_masked / cut_off
-        
-        # Compute the sum term inside the square root
-        sum_terms = (1/len(freqs_normalized))**2 + gradients**2
-        
-        # Calculate the arc length
-        arc_length = -np.sum(np.sqrt(sum_terms)) * (freqs_normalized[1] - freqs_normalized[0])
-        sal_values.append(arc_length)
-    
-    # Return mean SAL across dimensions
-    return np.mean(sal_values)
-def next_power_of_2(x: int) -> int:
-    """Return the next power of 2 greater than or equal to x"""
-    return int(1) if x == 0 else int(2**(np.ceil(np.log2(x))))'''

@@ -6,7 +6,7 @@ class Architecture_Base():
         self.pred_classes = []
         self.f1_list = []
         self.score_list = []
-        self.msad_list = []
+        self.smoothness_list = []
         self.iter_list = []
         self.loss_list = []
         if 'attr_dict' in arch_dict:

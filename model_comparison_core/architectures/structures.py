@@ -78,7 +78,7 @@ class External_Model_Base(Architecture_Base):
         self.pred_classes = []
         self.f1_list = []
         self.score_list = []
-        self.msad_list = []
+        self.smoothness_list = []
         self.iter_list = []
         self.loss_list = []
 
@@ -102,15 +102,15 @@ class External_Model_Base(Architecture_Base):
 
         self.score_list.append(scores['avg_norm_distance'])
         self.f1_list.append(scores['f1'])
-        self.msad_list.append(scores['avg_norm_msad'])
+        self.smoothness_list.append(scores['avg_norm_smoothness'])
         print('')
         print('SCORES: ')
         print('avg_norm_distance: ')
         print(scores['avg_norm_distance'])
         print('f1: ')
         print(scores['f1'])
-        print('avg_norm_msad: ')
-        print(scores['avg_norm_msad'])
+        print('avg_norm_smoothness: ')
+        print(scores['avg_norm_smoothness'])
         if scores['f1'] == 0:
             f1_score = 0.01
         else:
