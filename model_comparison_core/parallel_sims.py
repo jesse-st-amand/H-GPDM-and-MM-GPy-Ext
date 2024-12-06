@@ -75,16 +75,17 @@ if __name__ == "__main__":
     current_directory = os.path.dirname(os.path.abspath(__file__))
     parent_directory = os.path.dirname(current_directory)
 
-    param_dir = 'MCCV'
+    param_dir = 'MCCV_AISTATS'
     names = [
-        'GPDM_MCCV_BM_IC_testing',
-        #'RNN_MCCV_BM',
-        #'VAE_MCCV_BM',
-        #'transformer_MCCV_BM',
-        #'GPDM_MCCV_CMU_50',
-        #'RNN_MCCV_CMU',
-        #'VAE_MCCV_CMU',
-        #'transformer_MCCV_CMU',
+        #'GPDM_MCCV_BM_IC_testing',
+        'GPDM_MCCV_BM_50',
+        'RNN_MCCV_BM',
+        'VAE_MCCV_BM',
+        'transformer_MCCV_BM',
+        'GPDM_MCCV_CMU_50',
+        'RNN_MCCV_CMU',
+        'VAE_MCCV_CMU',
+        'transformer_MCCV_CMU',
     ]
 
     for name in names:
