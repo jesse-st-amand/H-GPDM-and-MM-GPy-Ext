@@ -1,0 +1,5 @@
+Model,Mean,Std Dev,Difference,Statistic,p-value
+GPDM_MCCV_CMU_50,,,-,-,-
+RNN_MCCV_CMU,,,,,
+transformer_MCCV_CMU,,,,,
+VAE_MCCV_CMU,,,,,

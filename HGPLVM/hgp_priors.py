@@ -1,29 +1,21 @@
 import logging
-import weakref
 from GPy.core import Param
-import numpy as np
 from GPy.core.parameterization import Parameterized
 from GPy.core.parameterization.priors import Prior
 from GPy.util.linalg import jitchol, symmetrify, dpotri
 from GPy.util.linalg import pdinv, dpotrs
 from paramz.domains import _REAL
-import GPy.kern as kern
 from HGPLVM.GPDM_kernels.rbf_acc import RBF_Acc
 from HGPLVM.GPDM_kernels.linear_acc import Linear_Acc
 from HGPLVM.GPDM_kernels.white import White
 from HGPLVM.GPDM_priors import GPDM_IG_prior
-from HGPLVM.GPDM_priors import GPDM_kernel_prior
 import GPy
-from GPy.inference.latent_function_inference.posterior import Posterior
 from GPy.util.linalg import jitchol, tdot, dtrtrs, dpotri, pdinv
 from GPy.util import diag
 import numpy as np
-from GPy.inference.latent_function_inference import LatentFunctionInference
 log_2_pi = np.log(2*np.pi)
 from scipy.special import logsumexp
-from functools import partial
 logger = logging.getLogger("GP")
-from abc import ABC, abstractmethod
 from functools import wraps
 
 

@@ -1,0 +1,4 @@
+Grouped by: hidden_size, latent_size
+Grouped Statistics:
+hidden_size,latent_size,Count,Avg Iteration of Best Score,Mean Best F1 Score,Std Dev Best F1 Score,Min of Best F1 Scores,Max of Best F1 Scores,Mean Best SMOOTHNESS,Std Dev Best SMOOTHNESS,Min of Best SMOOTHNESS,Max of Best SMOOTHNESS,Mean Best Score,Std Dev Best Score,Min of Best Scores,Max of Best Scores,score over f1
+692.000000,5.000000,33,37.272727,0.921081,0.055415,0.794286,1.000000,-0.170712,0.103389,-0.435836,-0.035375,0.165996,0.035399,0.115642,0.280768,0.180219

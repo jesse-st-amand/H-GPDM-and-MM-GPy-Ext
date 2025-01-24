@@ -5,33 +5,47 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2b14b5ad-b853-4544-b12d-282b71e0bf0c" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/environment.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV_AISTATS/GPDM_MCCV_BM_50.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV_AISTATS/GPDM_MCCV_CMU_50.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV_AISTATS/RNN_MCCV_BM.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV_AISTATS/RNN_MCCV_CMU.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV_AISTATS/VAE_MCCV_BM.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV_AISTATS/VAE_MCCV_CMU.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV_AISTATS/transformer_MCCV_BM.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV_AISTATS/transformer_MCCV_CMU.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV_AISTATS_ldj/GPDM_MCCV_BM_50.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV_AISTATS_ldj/GPDM_MCCV_CMU_50.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV_AISTATS_ldj/RNN_MCCV_BM.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV_AISTATS_ldj/RNN_MCCV_CMU.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV_AISTATS_ldj/VAE_MCCV_BM.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV_AISTATS_ldj/VAE_MCCV_CMU.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV_AISTATS_ldj/transformer_MCCV_BM.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV_AISTATS_ldj/transformer_MCCV_CMU.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV_AISTATS_sparc/GPDM_MCCV_BM_50.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV_AISTATS_sparc/GPDM_MCCV_CMU_50.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV_AISTATS_sparc/RNN_MCCV_BM.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV_AISTATS_sparc/RNN_MCCV_CMU.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV_AISTATS_sparc/VAE_MCCV_BM.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV_AISTATS_sparc/VAE_MCCV_CMU.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV_AISTATS_sparc/transformer_MCCV_BM.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV_AISTATS_sparc/transformer_MCCV_CMU.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/model_comparison_core/model_parameters/testing/GPDM_params_singular_sparc.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/model_comparison_core/model_parameters/testing/VAE_params_singular_sparc.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DSCs/data_set_class_base.py" beforeDir="false" afterPath="$PROJECT_DIR$/DSCs/data_set_class_base.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DSCs/evaluation_metrics.py" beforeDir="false" afterPath="$PROJECT_DIR$/DSCs/evaluation_metrics.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DSCs/smoothness_metrics.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/HGPLVM/GPDM_priors.py" beforeDir="false" afterPath="$PROJECT_DIR$/HGPLVM/GPDM_priors.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HGPLVM/GPLVM_node.py" beforeDir="false" afterPath="$PROJECT_DIR$/HGPLVM/GPLVM_node.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HGPLVM/architectures/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/HGPLVM/architectures/base.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HGPLVM/architectures/dynamics.py" beforeDir="false" afterPath="$PROJECT_DIR$/HGPLVM/architectures/dynamics.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_comparison_core.egg-info/SOURCES.txt" beforeDir="false" afterPath="$PROJECT_DIR$/model_comparison_core.egg-info/SOURCES.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_comparison_core.egg-info/top_level.txt" beforeDir="false" afterPath="$PROJECT_DIR$/model_comparison_core.egg-info/top_level.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HGPLVM/hgp_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/HGPLVM/hgp_model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HGPLVM/hgp_priors.py" beforeDir="false" afterPath="$PROJECT_DIR$/HGPLVM/hgp_priors.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HGPLVM/initializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/HGPLVM/initializers.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/model_comparison_core/architectures/structures.py" beforeDir="false" afterPath="$PROJECT_DIR$/model_comparison_core/architectures/structures.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_comparison_core/combined_dicts.pkl" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/model_comparison_core/comp_data_func.py" beforeDir="false" afterPath="$PROJECT_DIR$/model_comparison_core/comp_data_func.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV/GPDM_MCCV_BM_50.py" beforeDir="false" afterPath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV/GPDM_MCCV_BM_50.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV/GPDM_MCCV_CMU_50.py" beforeDir="false" afterPath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV/GPDM_MCCV_CMU_50.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV/RNN_MCCV_BM.py" beforeDir="false" afterPath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV/RNN_MCCV_BM.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV/RNN_MCCV_CMU.py" beforeDir="false" afterPath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV/RNN_MCCV_CMU.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV/VAE_MCCV_BM.py" beforeDir="false" afterPath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV/VAE_MCCV_BM.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV/VAE_MCCV_CMU.py" beforeDir="false" afterPath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV/VAE_MCCV_CMU.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV/transformer_MCCV_BM.py" beforeDir="false" afterPath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV/transformer_MCCV_BM.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV/transformer_MCCV_CMU.py" beforeDir="false" afterPath="$PROJECT_DIR$/model_comparison_core/model_parameters/MCCV/transformer_MCCV_CMU.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_comparison_core/model_parameters/testing/GPDM_params_singular.py" beforeDir="false" afterPath="$PROJECT_DIR$/model_comparison_core/model_parameters/testing/GPDM_params_singular.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_comparison_core/model_parameters/testing/RNN_params_singular.py" beforeDir="false" afterPath="$PROJECT_DIR$/model_comparison_core/model_parameters/testing/RNN_params_singular_sparc.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_comparison_core/model_parameters/testing/VAE_params_singular.py" beforeDir="false" afterPath="$PROJECT_DIR$/model_comparison_core/model_parameters/testing/VAE_params_singular.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_comparison_core/model_results_processing/MCCV_analysis_BM.py" beforeDir="false" afterPath="$PROJECT_DIR$/model_comparison_core/model_results_processing/MCCV_analysis_BM.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_comparison_core/model_results_processing/MCCV_analysis_CMU.py" beforeDir="false" afterPath="$PROJECT_DIR$/model_comparison_core/model_results_processing/MCCV_analysis_CMU.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_comparison_core/model_results_processing/compile_data_funcs.py" beforeDir="false" afterPath="$PROJECT_DIR$/model_comparison_core/model_results_processing/compile_data_funcs.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_comparison_core/model_results_processing/unpack_compile_all.py" beforeDir="false" afterPath="$PROJECT_DIR$/model_comparison_core/model_results_processing/unpack_compile_all.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/model_comparison_core/parallel_sims.py" beforeDir="false" afterPath="$PROJECT_DIR$/model_comparison_core/parallel_sims.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_comparison_core/single_sim_plot.py" beforeDir="false" afterPath="$PROJECT_DIR$/model_comparison_core/single_sim_plot.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_comparison_core/space.pkl" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/model_comparison_core/test_scoring_metric.py" beforeDir="false" afterPath="$PROJECT_DIR$/model_comparison_core/test_scoring_metric.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -42,30 +56,135 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 3
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
   <component name="ProjectId" id="2pqdWOmcv6aYm8HeoW4WpAl14aR" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.test_scoring_metric.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "C:/Users/jesse/Documents/Code_Projects/Python/HGP_concise",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.MCCV_analysis_BM.executor&quot;: &quot;Run&quot;,
+    &quot;Python.MCCV_analysis_CMU.executor&quot;: &quot;Run&quot;,
+    &quot;Python.parallel_sims.executor&quot;: &quot;Run&quot;,
+    &quot;Python.single_sim_plot.executor&quot;: &quot;Run&quot;,
+    &quot;Python.test_scoring_metric.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Jesse/Documents/Python/HGP_concise/model_comparison_core/model_parameters/testing&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
-  <component name="RunManager">
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Jesse\Documents\Python\HGP_concise\model_comparison_core\model_parameters\testing" />
+      <recent name="C:\Users\Jesse\Documents\Python\HGP_concise\model_comparison_core\model_parameters" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Jesse\Documents\Python\HGP_concise\HGPLVM_output_repository\MCCV\MSAD" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.single_sim_plot">
+    <configuration name="MCCV_analysis_BM" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="HGP_concise" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/model_comparison_core/model_results_processing" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/model_comparison_core/model_results_processing/MCCV_analysis_BM.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="MCCV_analysis_CMU" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="HGP_concise" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/model_comparison_core/model_results_processing" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/model_comparison_core/model_results_processing/MCCV_analysis_CMU.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="parallel_sims" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="HGP_concise" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/model_comparison_core" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/model_comparison_core/parallel_sims.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="single_sim_plot" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="HGP_concise" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/model_comparison_core" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/model_comparison_core/single_sim_plot.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="test_scoring_metric" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="HGP_concise" />
       <option name="ENV_FILES" value="" />
@@ -89,8 +208,19 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <list>
+      <item itemvalue="Python.MCCV_analysis_BM" />
+      <item itemvalue="Python.MCCV_analysis_CMU" />
+      <item itemvalue="Python.parallel_sims" />
+      <item itemvalue="Python.single_sim_plot" />
+      <item itemvalue="Python.test_scoring_metric" />
+    </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.single_sim_plot" />
+        <item itemvalue="Python.MCCV_analysis_CMU" />
+        <item itemvalue="Python.MCCV_analysis_BM" />
+        <item itemvalue="Python.parallel_sims" />
         <item itemvalue="Python.test_scoring_metric" />
       </list>
     </recent_temporary>
@@ -98,8 +228,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-1d06a55b98c1-0b3e54e931b4-JavaScript-PY-241.17011.127" />
-        <option value="bundled-python-sdk-48aec45f0201-7e9c3bbb6e34-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-241.17011.127" />
+        <option value="bundled-js-predefined-1d06a55b98c1-74d2a5396914-JavaScript-PY-241.14494.241" />
+        <option value="bundled-python-sdk-0509580d9d50-28c9f5db9ffe-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-241.14494.241" />
       </set>
     </attachedChunks>
   </component>
@@ -112,6 +242,9 @@
       <option name="presentableId" value="Default" />
       <updated>1733497571549</updated>
       <workItem from="1733497572592" duration="2667000" />
+      <workItem from="1733500988995" duration="18290000" />
+      <workItem from="1733764665703" duration="4766000" />
+      <workItem from="1737543135056" duration="21000" />
     </task>
     <servers />
   </component>
@@ -123,13 +256,17 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/DSCs/evaluation_metrics.py</url>
-          <line>81</line>
+          <line>131</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/HGP_concise$MCCV_analysis_CMU.coverage" NAME="MCCV_analysis_CMU Coverage Results" MODIFIED="1733839024772" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/model_comparison_core/model_results_processing" />
+    <SUITE FILE_PATH="coverage/HGP_concise$MCCV_analysis_BM.coverage" NAME="MCCV_analysis_BM Coverage Results" MODIFIED="1733838078349" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/model_comparison_core/model_results_processing" />
+    <SUITE FILE_PATH="coverage/HGP_concise$single_sim_plot.coverage" NAME="single_sim_plot Coverage Results" MODIFIED="1733761017912" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/model_comparison_core" />
     <SUITE FILE_PATH="coverage/HGP_concise$test_scoring_metric.coverage" NAME="test_scoring_metric Coverage Results" MODIFIED="1733499439115" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/model_comparison_core" />
+    <SUITE FILE_PATH="coverage/HGP_concise$parallel_sims.coverage" NAME="parallel_sims Coverage Results" MODIFIED="1733756019189" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/model_comparison_core" />
   </component>
 </project>

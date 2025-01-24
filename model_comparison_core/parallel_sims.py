@@ -75,17 +75,18 @@ if __name__ == "__main__":
     current_directory = os.path.dirname(os.path.abspath(__file__))
     parent_directory = os.path.dirname(current_directory)
 
-    param_dir = 'MCCV_AISTATS'
+    param_dir = 'MCCV_AISTATS_ldj'
     names = [
         #'GPDM_MCCV_BM_IC_testing',
-        'GPDM_MCCV_BM_50',
-        'RNN_MCCV_BM',
+        #'GPDM_MCCV_BM_50',
+        #'RNN_MCCV_BM',
         'VAE_MCCV_BM',
-        'transformer_MCCV_BM',
-        'GPDM_MCCV_CMU_50',
-        'RNN_MCCV_CMU',
-        'VAE_MCCV_CMU',
-        'transformer_MCCV_CMU',
+        #'transformer_MCCV_BM',
+        #'GPDM_MCCV_CMU_50',
+        #'RNN_MCCV_CMU',
+        #'VAE_MCCV_CMU',
+        #'transformer_MCCV_CMU',
+        #'VAE_params_singular_ldj',
     ]
 
     for name in names:
@@ -136,25 +137,6 @@ if __name__ == "__main__":
 
             print(f"Finished processing {name}")
             print(f"Final memory usage: {memory_usage():.2f} MB")
-        '''if len(local_vars['combined_dicts'][0]['dicts']) == 1:
-            if local_vars['combined_dicts'][0]['dicts'][0][1]['constant_args_dict'][
-                'num_sequences_per_action_test'] < 3:
-
-                traj_preds_mat = []
-                model = results[0][1]
-                for traj in model.arch.data_set_class.results_dict['pred_traj_lists']:
-                    traj_preds_mat.append(traj)
-                traj_preds_mat = np.around(np.vstack(traj_preds_mat), decimals=3)
-                print('Trajectory Confusion Matrix')
-                print(traj_preds_mat)
-                import matplotlib
-                matplotlib.use("TkAgg")
-                import matplotlib.animation as animation
-                IFs = model.IF_setup()
-                anis = []
-                for i, IFs_i in enumerate(IFs):
-                    fig, animate = IFs_i.plot_animation_all_figures()
-                    anis.append(animation.FuncAnimation(fig, animate, model.num_tps, interval=100))
-                matplotlib.pyplot.show()'''
+        
 
 

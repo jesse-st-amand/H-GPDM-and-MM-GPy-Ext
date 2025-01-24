@@ -28,7 +28,7 @@ num_sequences_per_action_train = 1
 ##
 hidden_size = 692
 latent_size = 5
-output_dir_name = 'MCCV_f1_dist_msad_'+data_set_name+'_Bayesian_VAE'
+output_dir_name = 'MCCV_f1_dist_ldj_'+data_set_name+'_Bayesian_VAE'
 #space.append(Integer(400,700,name='arch_dict:hidden_size'))
 #space.append(Integer(5,7,name='arch_dict:latent_size'))
 
@@ -38,8 +38,9 @@ fold_start = 0
 fold_end = 50
 fold_list = list(np.arange(fold_start,fold_end,1))
 fold_num = tuple(fold_list)
-scoring_method = 'f1_dist_msad:ff'
+scoring_method = 'f1_dist_ldj:ff'
 score_rate = int(num_epochs*.1)
+init_t = 0
 ##
 
 

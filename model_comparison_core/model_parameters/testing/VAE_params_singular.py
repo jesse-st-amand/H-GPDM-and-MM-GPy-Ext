@@ -2,39 +2,55 @@ import numpy as np
 import matplotlib
 matplotlib.use("TkAgg")
 from model_comparison_core.model_results_processing.dict_construction import construct_dict
+from skopt.space import Real, Integer, Categorical
+import os
 
-## BC geo universal
+# Get the directory containing the script
+param_dir = os.path.dirname(os.path.abspath(__file__))
+
 space = None
-
 ## ------ Simulations
-output_dir_name = 'temp_VAE_singular'
+
 
 data_set_name = 'Bimanual 3D'
-#data_set_name = 'Movements CMU'
 
 if data_set_name == "Bimanual 3D":
     actions = [0, 1, 2, 3, 4]
-    num_sequences_per_action_test = 9
+    num_sequences_per_action_test = 1
 elif data_set_name == "Movements CMU":
     actions = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-    num_sequences_per_action_test = 5
+    num_sequences_per_action_test = 1
 else:
     raise ValueError("Dataset does not exist.")
-people = [0]
 num_sequences_per_action_train = 1
-seq_len = 100
-num_folds = 5*(num_sequences_per_action_train+num_sequences_per_action_test)
-fold_num = 1#tuple(np.arange(0,num_folds,1))
-num_sims = 1
-scoring_method = 'joint_angles:ff'
 
+
+##
+hidden_size = 692
+latent_size = 5
+output_dir_name = 'temp_singular_f1_dist_ldj_'+data_set_name+'_VAE'
+#space.append(Integer(400,700,name='arch_dict:hidden_size'))
+#space.append(Integer(5,7,name='arch_dict:latent_size'))
+
+num_epochs = 30
+num_folds = 1
+fold_start = 0
+fold_end = 1
+fold_list = list(np.arange(fold_start,fold_end,1))
+fold_num = tuple(fold_list)
+scoring_method = 'f1_dist_ldj:ff'
+score_rate = int(num_epochs*.1)
+##
+
+
+people = [0]
+seq_len = 100
 model_type = 'VAE'
-num_epochs = 5
+num_sims = 1
 
 num_classes = int(len(actions))
-hidden_size = 600
-latent_size = 4
-pred_seq_len_ratio = .5
+
+pred_seq_len_ratio = .4
 sample_len = int(seq_len*pred_seq_len_ratio)
 ## ------ Simulations END
 

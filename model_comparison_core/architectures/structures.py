@@ -2,15 +2,103 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from transformers import BertModel, BertConfig
-from HGPLVM.architectures.base import Architecture_Base
+
 import numpy as np
 from GPy import kern
 from HGPLVM.hgp_model import HGPLVM
 from HGPLVM.GPLVM_node import GPLVM_node as GPNode
+#from HGPLVM.architectures.base import Architecture_Base
 from HGPLVM.architectures.base import HGP_arch
 import time
 
-class X1_Y1(HGP_arch):
+class Architecture_Base():
+    def __init__(self, arch_dict = {}, **kwargs):
+        if 'attr_dict' in arch_dict:
+            self.attr_dict = arch_dict['attr_dict']
+        else:
+            self.attr_dict = {}
+
+    def get_results(self, Y_list, label, **kwargs):
+        results = self.data_set_class.get_results(['Y_preds_list_'+label, 'pred_trajs_'+label, 'pred_traj_lists_'+label],
+                                                  self.predict_Ys_Xs, Y_list, init_t=self.wrapper.arch_dict['init_t'],
+                                                  seq_len=self.wrapper.arch_dict['sample_len'],
+                                                  **kwargs)
+        return [r.cpu().numpy() if isinstance(r, torch.Tensor) else r for r in results]
+    
+    def get_scores(self,true_sequences, pred_sequences, label, action_IDs_true, **kwargs):
+        return self.data_set_class.score(self.wrapper.arch_dict['sample_len'],
+                                         self.wrapper.arch_dict['scoring_method'], 
+                                         true_sequences, pred_sequences,
+                                         action_IDs_true,
+                                         self.data_set_class.results_dict['pred_trajs_'+label])
+    
+    def get_class_preds(self,label,action_IDs):
+        return [self.data_set_class.results_dict['pred_trajs_'+label],
+                                      action_IDs]
+    
+    def store_data(self, epoch, score_rate, num_epochs, loss, Y_true_list, Y_true_CCs, action_IDs_true, label):
+        if score_rate == 0:
+            pass
+        elif epoch % score_rate == 0:
+            print(f'Epoch [{epoch + 1}/{num_epochs}], Loss: {loss:.4f}')
+            self.score(Y_true_list, Y_true_CCs, label, epoch, loss, action_IDs_true)
+            #torch.cuda.synchronize()
+    
+    def score(self):
+        raise NotImplementedError
+
+class Evaluation_Base():
+    def __init__(self, **kwargs):
+        self.pred_classes = []
+        self.f1_list = []
+        self.score_list = []
+        self.smoothness_list = []
+        self.freeze_list = []
+        self.iter_list = []
+        self.loss_list = []
+        self.results_dict = {}
+
+    def scores_append_and_print(self, scores, epoch, loss, label, action_IDs):
+        self.pred_classes.append(self.get_class_preds(label, action_IDs))
+        self.score_list.append(scores['avg_norm_distance'])
+        self.f1_list.append(scores['f1'])
+        self.smoothness_list.append(scores['avg_norm_smoothness'])
+        self.freeze_list.append(scores['avg_freeze'])
+        self.iter_list.append(epoch)
+        self.loss_list.append(loss)
+
+        print('')
+        print('SCORES: ')
+        print('avg_norm_distance: ')
+        print(scores['avg_norm_distance'])
+        print('f1: ')
+        print(scores['f1'])
+        print('avg_norm_smoothness: ')
+        print(scores['avg_norm_smoothness'])
+        print('avg_freeze: ')
+        print(scores['avg_freeze'])
+        
+        if scores['f1'] == 0:
+            f1_score = 0.01
+        else:
+            f1_score = scores['f1']
+
+    def score(self, Y_true_list, Y_true_CCs, label, iters, loss, action_IDs, **kwargs):
+        self.data_set_class.results_dict = {}
+        results = self.get_results(Y_true_list, label)
+        self.results_dict['Y_pred_CCs_'+label] = self.data_set_class.Y_pos_list_to_stick_dicts_CCs(results[0])
+        true_sequences = self.data_set_class.CC_dict_list_to_CC_array_list_min_PV(Y_true_CCs)
+        pred_sequences = self.data_set_class.CC_dict_list_to_CC_array_list_min_PV(self.results_dict['Y_pred_CCs_'+label])
+        scores = self.get_scores(true_sequences, pred_sequences, label, action_IDs)
+        self.scores_append_and_print(scores, iters, loss, label, action_IDs)  
+        return scores['avg_norm_distance']
+    
+    
+    def count_parameters(self):
+        return sum(p.numel() for p in self.parameters() if p.requires_grad)
+
+
+class X1_Y1(HGP_arch, Evaluation_Base):
     def __init__(self, HGP, data_set_class, arch_dict = {}, **kwargs):
         if 'top_node_dict' in arch_dict:
             self.top_node_dict = arch_dict['top_node_dict']
@@ -27,6 +115,7 @@ class X1_Y1(HGP_arch):
                 'opt':None
             }
         super().__init__(HGP, data_set_class, arch_dict, **kwargs)
+        Evaluation_Base.__init__(self)
         self.merge_dicts(temp_top_node_dict, self.top_node_dict)
 
 
@@ -72,75 +161,11 @@ class X1_Y1(HGP_arch):
             IFs.append(self.data_set_class.IFs_func([Y_k_SD, Y_p_SD]))
         return IFs
 
-class External_Model_Base(Architecture_Base):
-    def __init__(self):
-        super().__init__()
-        self.pred_classes = []
-        self.f1_list = []
-        self.score_list = []
-        self.smoothness_list = []
-        self.iter_list = []
-        self.loss_list = []
-
-    def score(self, init_t=0, seq_len=10, **kwargs):
-        self.data_set_class.results_dict = {}
-
-        results = self.data_set_class.get_results(['Y_preds_list', 'pred_trajs', 'pred_traj_lists'],
-                                                  self.predict_Ys_Xs, self.data_set_class.Y_test_list, init_t=init_t,
-                                                  seq_len=self.wrapper.arch_dict['sample_len'],
-                                                  **kwargs)
-        results = [r.cpu().numpy() if isinstance(r, torch.Tensor) else r for r in results]
-        self.Y_test_CCs = self.data_set_class.Y_test_CCs
-        self.Y_pred_CCs = self.data_set_class.Y_pos_list_to_stick_dicts_CCs(results[0])
-        true_sequences = self.data_set_class.CC_dict_list_to_CC_array_list_min_PV(self.Y_test_CCs)
-        pred_sequences = self.data_set_class.CC_dict_list_to_CC_array_list_min_PV(self.Y_pred_CCs)
-
-
-        scores = self.data_set_class.score(self.wrapper.arch_dict['sample_len'],self.wrapper.arch_dict['scoring_method'], true_sequences, pred_sequences,
-                                              self.data_set_class.action_IDs_test,
-                                              self.data_set_class.results_dict['pred_trajs'])
-
-        self.score_list.append(scores['avg_norm_distance'])
-        self.f1_list.append(scores['f1'])
-        self.smoothness_list.append(scores['avg_norm_smoothness'])
-        print('')
-        print('SCORES: ')
-        print('avg_norm_distance: ')
-        print(scores['avg_norm_distance'])
-        print('f1: ')
-        print(scores['f1'])
-        print('avg_norm_smoothness: ')
-        print(scores['avg_norm_smoothness'])
-        if scores['f1'] == 0:
-            f1_score = 0.01
-        else:
-            f1_score = scores['f1']
-        return scores['avg_norm_distance']
-
-    def store_data(self, epoch, score_rate, num_epochs, loss, start):
-        if epoch % score_rate == 0 or epoch == num_epochs:
-            if epoch != 0:
-                torch.cuda.synchronize()
-                end = time.time()
-                print(f"Elapsed Time: {end - start}")
-            print(f'Epoch [{epoch + 1}/{num_epochs}], Loss: {loss:.4f}')
-            self.score()
-            self.pred_classes.append([self.data_set_class.results_dict['pred_trajs'],
-                                      self.data_set_class.action_IDs_test])
-            self.iter_list.append(epoch)
-            self.loss_list.append(loss)
-            torch.cuda.synchronize()
-            start = time.time()
-        return start
-
-    def count_parameters(self):
-        return sum(p.numel() for p in self.parameters() if p.requires_grad)
-
-
-class VAEMotionModel(nn.Module, External_Model_Base):
+class VAEMotionModel(nn.Module, Evaluation_Base, Architecture_Base):
     def __init__(self, wrapper, data_set_class, sample_len, input_size, num_classes, hidden_size=256, latent_size=32, subseq_len=10):
         super(VAEMotionModel, self).__init__()
-        External_Model_Base.__init__(self)
+        Evaluation_Base.__init__(self)
+        Architecture_Base.__init__(self)
         self.wrapper = wrapper
         self.input_size = input_size
         self.num_classes = num_classes
@@ -286,11 +311,13 @@ class VAEMotionModel(nn.Module, External_Model_Base):
                 num_batches += 1
 
             avg_loss = total_loss / num_batches
-
-            start = self.store_data(epoch, score_rate, num_epochs, avg_loss, start)
+            self.store_data(epoch, score_rate, num_epochs, avg_loss, self.data_set_class.Y_validation_list, self.data_set_class.Y_validation_CCs, self.data_set_class.action_IDs_validation,'validation')
+            self.store_data(epoch, score_rate, num_epochs, avg_loss, self.data_set_class.Y_test_list, self.data_set_class.Y_test_CCs, self.data_set_class.action_IDs_test,'test')
+        return self.score(self.data_set_class.Y_test_list, self.data_set_class.Y_test_CCs, 'test', num_epochs, avg_loss, self.data_set_class.action_IDs_test,)
 
     def predict_Ys_Xs(self, Y_test_list, init_t, seq_len=10, **kwargs):
         # Prepare subsequences for testing
+
         X_seqs = torch.tensor(Y_test_list, dtype=torch.float32).to(self.device)
         X_sub_seqs = X_seqs[:, :seq_len, :]  # Extract subsequences
 
@@ -318,7 +345,7 @@ class VAEMotionModel(nn.Module, External_Model_Base):
         return arr
 
     def IF_setup(self):
-        return self.IF_general(self.Y_pred_CCs, self.Y_test_CCs)
+        return self.IF_general(self.results_dict['Y_pred_CCs_test'], self.data_set_class.Y_test_CCs)
 
     def IF_general(self, prediction, ground_truth):
         IFs = []
@@ -326,202 +353,13 @@ class VAEMotionModel(nn.Module, External_Model_Base):
             IFs.append(self.data_set_class.IFs_func([Y_k_SD, Y_p_SD]))
         return IFs
 
-'''class LSTMVAEMotionModel(nn.Module, External_Model_Base):
-    def __init__(self, wrapper, data_set_class, sample_len, input_size, num_classes, hidden_size, latent_size, num_layers=1):
-        super().__init__()
-        self.sample_len = sample_len
 
-        # Encoder
-        self.encoder_lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True)
-        self.fc_mu = nn.Linear(hidden_size, latent_size)
-        self.fc_var = nn.Linear(hidden_size, latent_size)
-
-        # Decoder
-        self.decoder_lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True)
-        self.fc_output = nn.Linear(hidden_size, input_size)
-
-        # Latent to hidden state
-        self.latent_to_hidden = nn.Linear(latent_size, hidden_size)
-
-    def encode(self, x, lengths):
-        packed_x = nn.utils.rnn.pack_padded_sequence(x, lengths, batch_first=True, enforce_sorted=False)
-        _, (h_n, _) = self.encoder_lstm(packed_x)
-        h = h_n[-1]  # Use the last layer's hidden state
-        return self.fc_mu(h), self.fc_var(h)
-
-    def reparameterize(self, mu, log_var):
-        std = torch.exp(0.5 * log_var)
-        eps = torch.randn_like(std)
-        return mu + eps * std
-
-    def decode(self, z, target_length):
-        h0 = self.latent_to_hidden(z).unsqueeze(0)
-        c0 = torch.zeros_like(h0)
-
-        # Initialize first input as zeros
-        decoder_input = torch.zeros(z.size(0), 1, self.decoder_lstm.input_size, device=z.device)
-
-        outputs = []
-        for _ in range(target_length):
-            output, (h0, c0) = self.decoder_lstm(decoder_input, (h0, c0))
-            output = self.fc_output(output)
-            outputs.append(output)
-            decoder_input = output  # Use current output as next input
-
-        return torch.cat(outputs, dim=1)
-
-    def forward(self, x, lengths):
-        mu, log_var = self.encode(x, lengths)
-        z = self.reparameterize(mu, log_var)
-        recon_x = self.decode(z, x.size(1))
-        return recon_x, mu, log_var
-
-    def predict_and_generate(self, sequence, lengths):
-        self.eval()
-        with torch.no_grad():
-            sequence = sequence.to(self.device)
-            recon_batch, classification, _, _ = self(sequence, lengths)
-            predicted_class = torch.argmax(classification, dim=1)
-            return predicted_class, recon_batch
-
-    def loss_function(self, recon_x, x, mu, log_var, classification, label):
-        recon_x = recon_x.to(self.device)
-        x = x.to(self.device)
-        mu = mu.to(self.device)
-        log_var = log_var.to(self.device)
-        classification = classification.to(self.device)
-        label = label.to(self.device)
-
-        MSE = F.mse_loss(recon_x, x, reduction='sum')
-        KLD = -0.5 * torch.sum(1 + log_var - mu.pow(2) - log_var.exp())
-        CE = F.cross_entropy(classification, label, reduction='sum')
-
-        if torch.isnan(MSE) or torch.isinf(MSE):
-            print(f"NaN/Inf in MSE. recon_x: {recon_x}, x: {x}")
-            MSE = torch.tensor(float('inf'), device=self.device)
-
-        if torch.isnan(KLD) or torch.isinf(KLD):
-            print(f"NaN/Inf in KLD. mu: {mu}, log_var: {log_var}")
-            KLD = torch.tensor(float('inf'), device=self.device)
-
-        if torch.isnan(CE) or torch.isinf(CE):
-            print(f"NaN/Inf in CE. classification: {classification}, label: {label}")
-            CE = torch.tensor(float('inf'), device=self.device)
-
-        loss = MSE + KLD + CE
-
-        if torch.isnan(loss) or torch.isinf(loss):
-            print(f"NaN/Inf in total loss. MSE: {MSE}, KLD: {KLD}, CE: {CE}")
-            loss = torch.tensor(float('inf'), device=self.device)
-
-        return loss, MSE, KLD, CE
-
-    def optimize(self, optimizer, num_epochs=100):
-        X_seqs = torch.tensor(np.array(self.data_set_class.Y_train_list), dtype=torch.float32).to(self.device)
-        labels = torch.tensor(np.array(self.data_set_class.action_IDs_train), dtype=torch.long).to(self.device)
-
-        batch_size = min(32, len(X_seqs))
-        print(f"Total number of sequences: {len(X_seqs)}")
-        print(f"Batch size: {batch_size}")
-
-        score_rate = self.wrapper.arch_dict['score_rate']
-        start = time.time()
-        for epoch in range(num_epochs):
-            self.train()
-            total_loss = 0
-            num_batches = 0
-
-            # Shuffle data
-            perm = torch.randperm(len(X_seqs))
-            X_seqs = X_seqs[perm]
-            labels = labels[perm]
-
-            for i in range(0, len(X_seqs), batch_size):
-                batch_x_full = X_seqs[i:i + batch_size]
-                batch_labels = labels[i:i + batch_size]
-
-                # Generate random subsequence lengths for the batch
-                max_subseq_len = self.seq_len  # Maximum possible subsequence length
-                lengths = torch.randint(1, max_subseq_len + 1, (batch_x_full.size(0),))
-                lengths, perm_idx = lengths.sort(0, descending=True)
-                batch_x_full = batch_x_full[perm_idx]
-                batch_labels = batch_labels[perm_idx]
-
-                # Create subsequences
-                batch_x = [seq[:l] for seq, l in zip(batch_x_full, lengths)]
-                batch_target = batch_x_full  # Full sequences as targets
-
-                # Pad the sequences
-                batch_x_padded = nn.utils.rnn.pad_sequence(batch_x, batch_first=True)
-                batch_x_padded = batch_x_padded.to(self.device)
-                lengths = lengths.to(self.device)
-
-                optimizer.zero_grad()
-
-                recon_batch, classification, mu, log_var = self(batch_x_padded, lengths)
-                loss, MSE, KLD, CE = self.loss_function(recon_batch, batch_target, mu, log_var, classification, batch_labels)
-
-                loss.backward()
-                optimizer.step()
-                total_loss += loss.item()
-                num_batches += 1
-
-            avg_loss = total_loss / num_batches
-            start = self.store_data(epoch, score_rate, num_epochs, avg_loss, start)
-
-    def predict_Ys_Xs(self, Y_test_list, init_t, seq_len=10, **kwargs):
-        X_seqs = torch.tensor(Y_test_list, dtype=torch.float32).to(self.device)
-
-        Y_preds_list = []
-        pred_trajs_list = []
-
-        for x in X_seqs:
-            # Use self.sample_len for the subsequence length
-            x_sub = x[:self.sample_len].unsqueeze(0)  # Add batch dimension
-            lengths = torch.tensor([self.sample_len], dtype=torch.long).to(self.device)
-
-            pred_traj, Y_pred_sub = self.predict_and_generate(x_sub, lengths)
-
-            # Generate full-length sequence based on the subset prediction
-            Y_pred_full = torch.zeros_like(x).unsqueeze(0)
-            Y_pred_full[:, :self.sample_len, :] = Y_pred_sub[:, :self.sample_len, :]
-
-            for t in range(self.sample_len, x.size(0)):
-                next_input = Y_pred_full[:, t - self.sample_len:t, :]
-                next_lengths = torch.tensor([self.sample_len], dtype=torch.long).to(self.device)
-                _, next_pred = self.predict_and_generate(next_input, next_lengths)
-                Y_pred_full[:, t, :] = next_pred[:, -1, :]
-
-            Y_pred = Y_pred_full.squeeze(0).detach().cpu().numpy()
-
-            Y_preds_list.append(Y_pred)
-            pred_trajs_list.append(pred_traj.item())
-
-        Y_preds_array = np.array(Y_preds_list)
-
-        Y_pred_denorm_list = self.data_set_class.denorm_trajs(Y_preds_array, self.data_set_class.action_IDs_test)
-        return Y_pred_denorm_list, pred_trajs_list, pred_trajs_list
-
-    @staticmethod
-    def create_array_with_ones(shape, points):
-        arr = np.zeros(shape)
-        arr[points] = 1
-        return arr
-
-    def IF_setup(self):
-        return self.IF_general(self.Y_pred_CCs, self.Y_test_CCs)
-
-    def IF_general(self, prediction, ground_truth):
-        IFs = []
-        for i, (Y_p_SD, Y_k_SD) in enumerate(zip(prediction, ground_truth)):
-            IFs.append(self.data_set_class.IFs_func([Y_k_SD, Y_p_SD]))
-        return IFs
-'''
-class TransformerMotionModel(nn.Module, External_Model_Base):
+class TransformerMotionModel(nn.Module, Evaluation_Base, Architecture_Base):
     def __init__(self, wrapper, data_set_class, sample_len,input_size, num_classes, hidden_size_multiplier=1, num_layers=2,
                  num_heads=4, dropout=0.1, max_seq_length=100):
         super(TransformerMotionModel, self).__init__()
-        External_Model_Base.__init__(self)
+        Evaluation_Base.__init__(self)
+        Architecture_Base.__init__(self)
         self.wrapper = wrapper
         self.input_size = input_size
         self.num_classes = num_classes
@@ -633,7 +471,8 @@ class TransformerMotionModel(nn.Module, External_Model_Base):
             loss.backward()
             optimizer.step()
 
-            start = self.store_data(epoch, score_rate, num_epochs, loss.item(), start)
+            start = self.store_data(epoch, score_rate, num_epochs, loss.item(), start, Y_true_list, Y_true_CCs)
+        return self.score(Y_true_list, Y_true_CCs, iters=num_epochs, loss=loss.item())
 
 
     def predict_Ys_Xs(self, Y_test_list, init_t, seq_len=10, **kwargs):
@@ -677,11 +516,12 @@ class TransformerMotionModel(nn.Module, External_Model_Base):
         return IFs
 
 
-class SequenceClassifier(nn.Module, External_Model_Base):
+class SequenceClassifier(nn.Module, Evaluation_Base, Architecture_Base):
     def __init__(self, wrapper, data_set_class, sample_len,input_size, num_classes, hidden_size=50, num_layers=2,
                  seq_len=100, **kwargs):
         super(SequenceClassifier, self).__init__()
-        External_Model_Base.__init__(self)
+        Evaluation_Base.__init__(self)
+        Architecture_Base.__init__(self)
         self.num_classes = num_classes
         self.data_set_class = data_set_class
         self.wrapper = wrapper
@@ -771,7 +611,8 @@ class SequenceClassifier(nn.Module, External_Model_Base):
             loss.backward()
             optimizer.step()
 
-            start = self.store_data(epoch, score_rate, num_epochs, loss.item(), start)
+            start = self.store_data(epoch, score_rate, num_epochs, loss.item(), start, Y_true_list, Y_true_CCs)
+        return self.score(Y_true_list, Y_true_CCs, iters=num_epochs, loss=loss.item())
 
     '''def predict_Ys_Xs(self, Y_test_list, init_t, seq_len=10, **kwargs):
         num_seqs = len(Y_test_list)

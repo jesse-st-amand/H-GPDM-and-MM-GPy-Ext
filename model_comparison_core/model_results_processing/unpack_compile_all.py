@@ -33,17 +33,17 @@ def unpack_directory(source_dir):
     print("Original subdirectories have been removed.")
     return copy_dir
 
-def process_model(model_name, grouping_params):
+def process_model(model_name, model_summaries_sub_dir, grouping_params,smoothness_metric):
     base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-    base_path = base_dir+r'\HGPLVM_output_repository\model_summaries'
+    base_path = base_dir + '/HGPLVM_output_repository/model_summaries/' + model_summaries_sub_dir
 
     print(f"Processing model: {model_name}")
     print(f"Importing parameters from: model_comparison_core.model_parameters.{model_name}")
 
     # Dynamically import parameters
     local_vars = {}
-    string = f'from model_comparison_core.model_parameters.{model_name} import *'
+    string = f'from model_comparison_core.model_parameters.{model_summaries_sub_dir}.{model_name} import *'
     exec(string, {}, local_vars)
 
     # Get the directory name from local_vars
@@ -85,30 +85,37 @@ def process_model(model_name, grouping_params):
     parameters_to_include = ['score'] + grouping_params
 
     # Run the main compilation function
-    compile_main(unpacked_dir, parameters_to_include, grouping_params, output_file)
+    compile_main(unpacked_dir, parameters_to_include, grouping_params, output_file, smoothness_metric=smoothness_metric)
 
 def main():
+    model_summaries_sub_dir = 'MCCV_AISTATS_sparc'
+    data_set = 'BM'
+    smoothness_metric = 'smoothness'
     models = [
         {
-            'name': 'GPDM_params_Bayesian_BM_50',
+            'name': 'GPDM_MCCV_'+data_set+'_50',
+            'model_summaries_sub_dir': model_summaries_sub_dir,
             'grouping_params': ['input_dim']
         },
         {
-            'name': 'RNN_params_Bayesian_BM',
+            'name': 'RNN_MCCV_'+data_set,
+            'model_summaries_sub_dir': model_summaries_sub_dir,
             'grouping_params': ['hidden_size', 'num_layers']
         },
         {
-            'name': 'transformer_params_Bayesian_BM',
+            'name': 'transformer_MCCV_'+data_set,
+            'model_summaries_sub_dir': model_summaries_sub_dir,
             'grouping_params': ['hidden_size_multiplier', 'num_layers', 'num_heads', 'dropout']
         },
         {
-            'name': 'VAE_params_Bayesian_BM',
+            'name': 'VAE_MCCV_'+data_set,
+            'model_summaries_sub_dir': model_summaries_sub_dir,
             'grouping_params': ['hidden_size', 'latent_size']
         }
     ]
 
     for model in models:
-        process_model(model['name'], model['grouping_params'])
+        process_model(model['name'], model['model_summaries_sub_dir'], model['grouping_params'], smoothness_metric)
 
 if __name__ == "__main__":
     main()

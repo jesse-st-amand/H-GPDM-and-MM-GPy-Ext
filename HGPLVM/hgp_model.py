@@ -1,13 +1,8 @@
 import numpy as np
 from GPy.core.model import Model
-from GPy import likelihoods
-from GPy.inference.latent_function_inference import exact_gaussian_inference, expectation_propagation
-from GPy.util.linalg import pdinv
-from GPy.util import diag
 import logging
 from paramz.core.parameter_core import adjust_name_for_printing
 from collections import OrderedDict
-from paramz import ObsAr
 from HGPLVM.global_functions import bit_racer as br
 
 
@@ -141,8 +136,8 @@ class HGPLVM(Model):
             GPNode.set_Y(np.hstack(Ys))
         #self.grad_dict[str(GPNode.node_nID)] = GPNode.gradient
         GPNode.parameters_changed()
-        if self.learning_n % self.arch.attr_dict['score_rate'] == 1:
-            self.arch.score()
+
+        self.arch.store_data(self.learning_n, self.arch.attr_dict['score_rate'], self.ObjFunVal)
         self.learning_n += 1
         #self.grad_dict[str(GPNode.node_nID)] = GPNode.gradient
 

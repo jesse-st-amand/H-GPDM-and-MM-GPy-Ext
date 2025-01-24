@@ -5,14 +5,10 @@ from matplotlib import pyplot as plt
 import matplotlib
 matplotlib.use('TkAgg')
 from glob import glob
-#import DSC_tools_bac as DSC_tools
 from . import DSC_tools
 from scipy.spatial.distance import euclidean
-from fastdtw import fastdtw
 from sklearn.metrics import confusion_matrix
 import seaborn as sns
-from sklearn.metrics import f1_score
-from frechetdist import frdist
 import os
 from .evaluation_metrics import score_f1_dist_smoothness
 class DataSetClassBase:
@@ -176,39 +172,39 @@ class DataSetClassMovementBase(DataSetClassSequencesBase):
         if 'indices' in attr_dict.keys():
             self.indices_list = attr_dict['indices']
 
-        # Determine the number of extra sequences per action
+        # Determine the number of validation sequences per action
         if 'X_init' in attr_dict.keys():
             if attr_dict['X_init'] is not None:
-                num_sequences_per_action_extra = num_sequences_per_action_train - 1
+                num_sequences_per_action_validation = num_sequences_per_action_train - 1
                 num_sequences_per_action_train = 1
             else:
-                num_sequences_per_action_extra = (
+                num_sequences_per_action_validation = (
                         self.full_num_seqs_per_subj_per_act
                         - num_sequences_per_action_train
                         - num_sequences_per_action_test
                 )
         else:
-            num_sequences_per_action_extra = (
+            num_sequences_per_action_validation = (
                     self.full_num_seqs_per_subj_per_act
                     - num_sequences_per_action_train
                     - num_sequences_per_action_test
             )
 
-        # Get training, testing, and extra datasets
+        # Get training, testing, and validation datasets
         (
             Y_train,
             Y_test,
-            Y_extra,
+            Y_validation,
             Y_train_list,
             Y_test_list,
-            Y_extra_list,
+            Y_validation_list,
         ) = self.get_NxD_subsets_pos(
             seq_len,
             actions,
             people,
             num_sequences_per_action_train,
             num_sequences_per_action_test,
-            num_sequences_per_action_extra,
+            num_sequences_per_action_validation,
         )
 
         # Convert positions to stick figure representations
@@ -218,13 +214,17 @@ class DataSetClassMovementBase(DataSetClassSequencesBase):
         self.Y_test_CCs = self.Y_pos_list_to_stick_dicts_CCs(
             self.denorm_trajs(Y_test_list, self.action_IDs_test)
         )
-
+        self.Y_validation_CCs = self.Y_pos_list_to_stick_dicts_CCs(
+            self.denorm_trajs(Y_validation_list, self.action_IDs_validation)
+        )
         # Handle datasets with or without EPs (End Points)
         if name == self.name:
             self.Y_train = Y_train
             self.Y_test = Y_test
+            self.Y_validation = Y_validation
             self.Y_train_list = Y_train_list
             self.Y_test_list = Y_test_list
+            self.Y_validation_list = Y_validation_list
 
         elif name == f"{self.name} with EPs":
             # Process training data
@@ -253,6 +253,16 @@ class DataSetClassMovementBase(DataSetClassSequencesBase):
                 Y_test_CC_norm = (Y_test_CC_temp - Y_train_CC_avg) / Y_train_CC_std
                 Y_test_list_EPs.append(np.hstack([Y_test_JA, Y_test_CC_norm]))
 
+            Y_validation_CC_list = []
+            for Y_validation_CC in self.Y_validation_CCs:
+                CC_short_list = [Y_validation_CC[EP_key]['CC'] for EP_key in self.score_EPs_fb]
+                Y_validation_CC_list.append(np.hstack(CC_short_list))
+
+            Y_validation_list_EPs = []
+            for Y_validation_CC_temp, Y_validation_JA in zip(Y_validation_CC_list, Y_validation_list):
+                Y_validation_CC_norm = (Y_validation_CC_temp - Y_train_CC_avg) / Y_train_CC_std
+                Y_validation_list_EPs.append(np.hstack([Y_validation_JA, Y_validation_CC_norm]))
+
             # Update averages and standard deviations
             Y_train_CC_avg = Y_train_CC_avg[np.newaxis, :, np.newaxis, np.newaxis, np.newaxis]
             Y_train_CC_std = Y_train_CC_std[np.newaxis, :, np.newaxis, np.newaxis, np.newaxis]
@@ -262,8 +272,10 @@ class DataSetClassMovementBase(DataSetClassSequencesBase):
             # Update datasets
             self.Y_train = np.vstack(Y_train_list_EPs)
             self.Y_test = np.vstack(Y_test_list_EPs)
+            self.Y_validation = np.vstack(Y_validation_list_EPs)
             self.Y_train_list = Y_train_list_EPs
             self.Y_test_list = Y_test_list_EPs
+            self.Y_validation_list = Y_validation_list_EPs
 
         else:
             raise ValueError(f"Invalid dataset name: {name}")
@@ -274,8 +286,8 @@ class DataSetClassMovementBase(DataSetClassSequencesBase):
                 from sklearn_extra.cluster import KMedoids
                 from sklearn.decomposition import KernelPCA
 
-                transformer = KernelPCA(n_components=Y_extra.shape[1], kernel='rbf')
-                X = transformer.fit_transform(Y_extra)
+                transformer = KernelPCA(n_components=Y_validation.shape[1], kernel='rbf')
+                X = transformer.fit_transform(Y_validation)
 
                 X_NxD_list = self.split_NxD_matrix(X, self.num_tps)
 
@@ -283,10 +295,10 @@ class DataSetClassMovementBase(DataSetClassSequencesBase):
                 Y_list = []
                 X_list_temp = []
                 Y_list_temp = []
-                for i, (Y, X_seq) in enumerate(zip(Y_extra_list, X_NxD_list)):
+                for i, (Y, X_seq) in enumerate(zip(Y_validation_list, X_NxD_list)):
                     X_list_temp.append(X_seq)
                     Y_list_temp.append(Y)
-                    if (i + 1) % num_sequences_per_action_extra == 0:
+                    if (i + 1) % num_sequences_per_action_validation == 0:
                         X_list.append(X_list_temp)
                         Y_list.append(Y_list_temp)
                         X_list_temp = []
@@ -434,8 +446,10 @@ class DataSetClassMovementBase(DataSetClassSequencesBase):
             return self.score_dynamic(sample_len, subtype, Y1, Y2, Y1_ID, Y2_ID)
         elif type == 'f1_dist_msad':
             return self.score_f1_dist_msad(sample_len, Y1, Y2, Y1_ID, Y2_ID)
-        elif type == 'f1_dist_smoothness':
+        elif type == 'f1_dist_ldj':
             return score_f1_dist_smoothness(sample_len, Y1, Y2, Y1_ID, Y2_ID, distance_metric='frechet', smoothness_metric='ldj')
+        elif type == 'f1_dist_sparc':
+            return score_f1_dist_smoothness(sample_len, Y1, Y2, Y1_ID, Y2_ID, distance_metric='frechet', smoothness_metric='sparc')
         elif type == 'static':
             # self.score_static()
             raise NotImplementedError
@@ -459,6 +473,7 @@ class DataSetClassMovementBase(DataSetClassSequencesBase):
         return joint_angles_array
 
     def compute_dtw_distance(self, x_g, x_p):
+        from fastdtw import fastdtw
         # Ensure the input arrays are 2D
         x_g_2d = x_g.reshape(x_g.shape[0], -1)
         x_p_2d = x_p.reshape(x_p.shape[0], -1)
@@ -487,7 +502,7 @@ class DataSetClassMovementBase(DataSetClassSequencesBase):
         return
 
     def index_subset(self, len_seq, actions, people, num_train_seqs_per_subj_per_act,
-                     num_test_seqs_per_subj_per_act, num_extra_seqs_per_subj_per_act=0, num_simulations=1):
+                     num_test_seqs_per_subj_per_act, num_validation_seqs_per_subj_per_act=0, num_simulations=1):
         """
         Splits data for given actions and sequences_per_action.
         """
@@ -496,6 +511,7 @@ class DataSetClassMovementBase(DataSetClassSequencesBase):
         self.sub_num_subjects = len(people)
         self.num_train_seqs_per_subj_per_act = num_train_seqs_per_subj_per_act
         self.num_test_seqs_per_subj_per_act = num_test_seqs_per_subj_per_act
+        self.num_validation_seqs_per_subj_per_act = num_validation_seqs_per_subj_per_act
         self.sub_tot_num_train_seqs = self.num_train_seqs_per_subj_per_act * self.sub_num_actions * self.sub_num_subjects
         self.sub_tot_num_test_seqs = self.num_test_seqs_per_subj_per_act * self.sub_num_actions * self.sub_num_subjects
         self.num_simulations = num_simulations
@@ -504,19 +520,19 @@ class DataSetClassMovementBase(DataSetClassSequencesBase):
 
         actions_dict_train = {action: None for action in actions}
         actions_dict_test = {action: None for action in actions}
-        actions_dict_extra = {action: None for action in actions}
+        actions_dict_validation = {action: None for action in actions}
 
         people_dict_train = {person: copy.deepcopy(actions_dict_train) for person in people}
         people_dict_test = {person: copy.deepcopy(actions_dict_test) for person in people}
-        people_dict_extra = {person: copy.deepcopy(actions_dict_extra) for person in people}
+        people_dict_validation = {person: copy.deepcopy(actions_dict_validation) for person in people}
 
         training_sims = {}
-        extra_sims = {}
+        validation_sims = {}
         testing_sims = {}
         for sim_num in range(self.num_folds):
             training_sims[sim_num] = copy.deepcopy(people_dict_train)
             testing_sims[sim_num] = copy.deepcopy(people_dict_test)
-            extra_sims[sim_num] = copy.deepcopy(people_dict_extra)
+            validation_sims[sim_num] = copy.deepcopy(people_dict_validation)
 
         if num_train_seqs_per_subj_per_act == 1:
             combo_list = DSC_tools.DSC_format_list(len(actions), len(seq_indices), self.num_folds)
@@ -532,15 +548,15 @@ class DataSetClassMovementBase(DataSetClassSequencesBase):
                 for act_num, indices in enumerate(combo):
                     sel_seq_indices_train = indices[0]
                     sel_seq_indices_test = indices[1][:num_test_seqs_per_subj_per_act]
-                    sel_seq_indices_extra = indices[1][num_test_seqs_per_subj_per_act:]
+                    sel_seq_indices_validation = indices[1][num_test_seqs_per_subj_per_act:]
                     training_sims[sim_num][person][act_num] = sel_seq_indices_train
                     testing_sims[sim_num][person][act_num] = sel_seq_indices_test
-                    extra_sims[sim_num][person][act_num] = sel_seq_indices_extra
+                    validation_sims[sim_num][person][act_num] = sel_seq_indices_validation
         if self.fold_num == 'all':
-            return {'train': training_sims, 'test': testing_sims, 'extra': extra_sims}
+            return {'train': training_sims, 'test': testing_sims, 'validation': validation_sims}
         else:
             return {'train': {0: training_sims[self.fold_num]}, 'test': {0: testing_sims[self.fold_num]},
-                    'extra': {0: extra_sims[self.fold_num]}}
+                    'validation': {0: validation_sims[self.fold_num]}}
 
     def indices2data(self, full_data_set, indices, num_seqs):
         num_sims = len(indices.keys())
@@ -578,11 +594,11 @@ class DataSetClassMovementBase(DataSetClassSequencesBase):
         return data_array, data_NxD_array, seq_eps, action_IDs
 
     def get_NxD_subsets_pos(self, seq_len, actions, people, num_sequences_per_action_train,
-                            num_sequences_per_action_test, num_sequences_per_action_extra):
+                            num_sequences_per_action_test, num_sequences_per_action_validation):
         actions, people = self.get_acts_ppl(actions, people)
         self.indices = self.index_subset(seq_len, actions, people, num_sequences_per_action_train,
                                     num_sequences_per_action_test,
-                                    num_extra_seqs_per_subj_per_act=num_sequences_per_action_extra)
+                                    num_validation_seqs_per_subj_per_act=num_sequences_per_action_validation)
         #print(indices)
 
         data_subset_train, _, self.seq_eps_train, self.action_IDs_train = self.indices2data(self.Y_pos,
@@ -590,9 +606,9 @@ class DataSetClassMovementBase(DataSetClassSequencesBase):
                                                                                             self.num_train_seqs_per_subj_per_act)
         data_subset_test, _, self.seq_eps_test, self.action_IDs_test = self.indices2data(self.Y_pos, self.indices['test'],
                                                                                          self.num_test_seqs_per_subj_per_act)
-        data_subset_extra, _, self.seq_eps_extra, self.action_IDs_extra = self.indices2data(self.Y_pos,
-                                                                                            self.indices['extra'],
-                                                                                            num_sequences_per_action_extra)
+        data_subset_validation, _, self.seq_eps_validation, self.action_IDs_validation = self.indices2data(self.Y_pos,
+                                                                                            self.indices['validation'],
+                                                                                            num_sequences_per_action_validation)
 
         #print(np.sum(self.Y_pos.flatten()))
         self.controls = data_subset_train[:, :, :1, :, :]
@@ -600,19 +616,19 @@ class DataSetClassMovementBase(DataSetClassSequencesBase):
         #print('avgs: ', np.sum(self.avgs[:5].flatten()))
         #print('stds: ', np.sum(self.stds[:5].flatten()))
         data_subset_norm_test = self.normalize_per_dim(data_subset_test, self.avgs, self.stds)
-        data_subset_norm_extra = self.normalize_per_dim(data_subset_extra, self.avgs, self.stds)
+        data_subset_norm_validation = self.normalize_per_dim(data_subset_validation, self.avgs, self.stds)
         self.mn_start_pos_norm = self.mn_start_pos - self.avgs
         self.mn_start_pos_norm /= self.stds
         Y_train_list = self.format_seq_list(data_subset_norm_train)
         Y_test_list = self.format_seq_list(data_subset_norm_test)
-        Y_extra_list = self.format_seq_list(data_subset_norm_extra)
+        Y_validation_list = self.format_seq_list(data_subset_norm_validation)
         Y_train = np.vstack(Y_train_list)
         Y_test = np.vstack(Y_test_list)
-        if Y_extra_list == []:
-            Y_extra = np.array([])
+        if Y_validation_list == []:
+            Y_validation = np.array([])
         else:
-            Y_extra = np.vstack(Y_extra_list)
-        return Y_train, Y_test, Y_extra, Y_train_list, Y_test_list, Y_extra_list
+            Y_validation = np.vstack(Y_validation_list)
+        return Y_train, Y_test, Y_validation, Y_train_list, Y_test_list, Y_validation_list
 
     def get_acts_ppl(self, actions, people):
         if isinstance(actions, list):

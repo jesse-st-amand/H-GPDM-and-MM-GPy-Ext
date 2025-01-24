@@ -1,0 +1,4 @@
+Grouped by: hidden_size_multiplier, num_layers, num_heads, dropout
+Grouped Statistics:
+hidden_size_multiplier,num_layers,num_heads,dropout,Count,Avg Iteration of Best Score,Mean Best F1 Score,Std Dev Best F1 Score,Min of Best F1 Scores,Max of Best F1 Scores,Mean Best SMOOTHNESS,Std Dev Best SMOOTHNESS,Min of Best SMOOTHNESS,Max of Best SMOOTHNESS,Mean Best Score,Std Dev Best Score,Min of Best Scores,Max of Best Scores,score over f1
+35.000000,2.000000,13.000000,0.300000,28,39.642857,0.931917,0.082667,0.679206,1.000000,-0.108149,0.197965,-0.806006,0.198984,0.282864,0.030015,0.219280,0.361517,0.303529

@@ -10,9 +10,6 @@ from HGPLVM.hgp_priors import GPDMM, GPDM#,GPDM_1st_order,GPDM_base,full_GPDM
 from HGPLVM.GPDM_priors import GPDM_IG_prior
 import random
 from GPy.models import GPRegression
-from GPy import kern
-from GPy.util.linalg import pdinv
-from GPy.util import diag
 
 
 def print_current_seeds():

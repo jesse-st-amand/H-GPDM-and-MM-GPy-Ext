@@ -120,7 +120,8 @@ def write_comp_dict(kwargs):
                 'max_seq_length': kwargs['seq_len'],
                 'sample_len': kwargs['sample_len'],
                 'scoring_method': kwargs['scoring_method'],
-                'score_rate': kwargs['score_rate']
+                'score_rate': kwargs['score_rate'],
+                'init_t': kwargs['init_t'],
             }
         }
     elif kwargs['model_type'].lower() == 'lstm':
@@ -137,7 +138,8 @@ def write_comp_dict(kwargs):
                 'num_layers': kwargs['num_layers'],
                 'sample_len': kwargs['sample_len'],
                 'scoring_method': kwargs['scoring_method'],
-                'score_rate': kwargs['score_rate']
+                'score_rate': kwargs['score_rate'],
+                'init_t': kwargs['init_t'],
             }
         }
     elif kwargs['model_type'].lower() == 'vae':
@@ -154,7 +156,8 @@ def write_comp_dict(kwargs):
                 'latent_size': kwargs['latent_size'],
                 'sample_len': kwargs['sample_len'],
                 'scoring_method':kwargs['scoring_method'],
-                'score_rate': kwargs['score_rate']
+                'score_rate': kwargs['score_rate'],
+                'init_t': kwargs['init_t'],
             }
         }
     elif kwargs['model_type'].lower() == 'gpdm':

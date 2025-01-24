@@ -1,0 +1,4 @@
+Grouped by: input_dim
+Grouped Statistics:
+input_dim,Count,Avg Iteration of Best Score,Mean Best F1 Score,Std Dev Best F1 Score,Min of Best F1 Scores,Max of Best F1 Scores,Mean Best SMOOTHNESS,Std Dev Best SMOOTHNESS,Min of Best SMOOTHNESS,Max of Best SMOOTHNESS,Mean Best Score,Std Dev Best Score,Min of Best Scores,Max of Best Scores,score over f1
+24.000000,50,29.000000,0.966261,0.042523,0.816727,1.000000,-0.405304,0.109102,-0.789289,-0.237527,0.148663,0.015257,0.119671,0.179995,0.153854

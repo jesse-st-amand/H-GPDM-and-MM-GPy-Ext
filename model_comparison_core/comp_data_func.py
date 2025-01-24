@@ -110,11 +110,12 @@ def write_results_to_csv(filename, result, comp_dict, data_dict, space_dict=None
         writer.writerow(['--- ITERATION RESULTS ---'])
         writer.writerow([])
 
-        # Write second table
-        writer.writerow(['iteration', 'score', "loss", 'predicted classes', 'f1', 'smoothness'])
-        for i, (score, iter, loss, pc, f1, smoothness) in enumerate(zip(result['fun'], result['iter'], result['loss'],
-                                                    result['pred_classes'], result['f1'], result['smoothness'])):
-            writer.writerow([str(iter), score, loss, pc, f1, smoothness])
+        # Write second table with freeze metric
+        writer.writerow(['iteration', 'score', "loss", 'predicted classes', 'f1', 'smoothness', 'avg_freeze'])
+        for i, (score, iter, loss, pc, f1, smoothness, freeze) in enumerate(zip(result['fun'], result['iter'], 
+                                                    result['loss'], result['pred_classes'], result['f1'], 
+                                                    result['smoothness'], result['freeze'])):
+            writer.writerow([str(iter), score, loss, pc, f1, smoothness, freeze])
 def end_path_key_value(path_dict, writer, exclude_keys = []):
     if path_dict is None:
         return
@@ -144,23 +145,24 @@ def comp_func(data_set_class,  model_dict, seed=0, dict_index=0, fold_num=1, sav
         model.get_attribute_dict()
         data_set_class.store_HGP_attributes(model)
         print(model.get_attribute_dict())
+        score = model.score(iters=model.arch.model.learning_n, loss=model.arch.model.ObjFunVal)
     elif new_model_dict['attr_dict']['model_type'].lower() == 'vae':
         model = VAEModelWrapper(new_model_dict, data_set_class=data_set_class)
-        model.optimize(num_epochs=model_dict['attr_dict']['num_epochs'])
+        score = model.optimize(num_epochs=model_dict['attr_dict']['num_epochs'])
     elif new_model_dict['attr_dict']['model_type'].lower() == 'transformer':
         model = TransformerModelWrapper(new_model_dict, data_set_class=data_set_class)
         criterion_classification, criterion_generation, optimizer = model.setup()
-        model.optimize(criterion_classification, criterion_generation, optimizer,
+        score = model.optimize(criterion_classification, criterion_generation, optimizer,
                        num_epochs=model_dict['attr_dict']['num_epochs'])
     elif new_model_dict['attr_dict']['model_type'].lower() == 'lstm':
         model = RNN_Wrapper(new_model_dict, data_set_class=data_set_class)
         criterion_classification, criterion_generation, optimizer = model.setup()
-        model.optimize(criterion_classification, criterion_generation, optimizer,
+        score = model.optimize(criterion_classification, criterion_generation, optimizer,
                        num_epochs=model_dict['attr_dict']['num_epochs'])
     else:
         raise ValueError(f'Unknown model type {new_model_dict["attr_dict"]["model_type"]}')
 
-    score = model.score()
+    
     result = {
         'space': space_dict,
         'fun': model.arch.score_list,
@@ -168,7 +170,8 @@ def comp_func(data_set_class,  model_dict, seed=0, dict_index=0, fold_num=1, sav
         'loss': model.arch.loss_list,
         'pred_classes': model.arch.pred_classes,
         'f1': model.arch.f1_list,
-        'smoothness': model.arch.smoothness_list
+        'smoothness': model.arch.smoothness_list,
+        'freeze': model.arch.freeze_list
     }
 
 

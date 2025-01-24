@@ -31,7 +31,7 @@ hidden_size_multiplier = 35
 num_layers = 2
 num_heads = 13
 dropout = .3
-output_dir_name = 'MCCV_f1_dist_ldj_'+data_set_name+'_Bayesian_Transformer'
+output_dir_name = 'MCCV_f1_dist_sparc_'+data_set_name+'_Bayesian_Transformer'
 #space.append(Integer(25,45,name='arch_dict:hidden_size_multiplier'))
 #space.append(Integer(2,4,name='arch_dict:num_layers'))
 #space.append(Integer(2,18,name='arch_dict:num_heads'))
@@ -42,7 +42,7 @@ fold_start = 0
 fold_end = 50
 fold_list = list(np.arange(fold_start,fold_end,1))
 fold_num = tuple(fold_list)
-scoring_method = 'f1_dist_ldj:ff'
+scoring_method = 'f1_dist_sparc:ff'
 score_rate = int(num_epochs*.1)
 ##
 

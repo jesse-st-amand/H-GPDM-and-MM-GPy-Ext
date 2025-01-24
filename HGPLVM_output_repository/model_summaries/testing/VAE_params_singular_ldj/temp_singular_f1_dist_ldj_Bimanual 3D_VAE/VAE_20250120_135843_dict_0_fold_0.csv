@@ -1,0 +1,18 @@
+Parameter,Optimized Value
+model_type,VAE
+num_epochs,30
+model_type,VAE
+input_size,117
+num_classes,5
+hidden_size,692
+latent_size,5
+sample_len,40
+scoring_method,f1_dist_ldj:ff
+score_rate,30
+actions,"[""box_lift"", ""box_turn_cw_forward"", ""box_lateral_left"", ""bread_cutting_right"", ""jar_opening_right_open""]"
+people,[1]
+
+--- ITERATION RESULTS ---
+
+iteration,score,loss,predicted classes,f1,smoothness
+0,0.2878672804047776,68225.8046875,"[[3, 3, 1, 4, 1, 3, 3, 3, 3, 3, 4, 1, 1, 1, 4, 1, 3, 3, 3, 3, 3, 1, 4, 3, 1, 3, 3, 3, 1, 1, 1, 3, 1, 1, 3, 3, 3, 3, 3, 3, 3, 3, 1, 3, 3], [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4]]",0.11400966183574879,-1.5795085495824714

@@ -26,7 +26,7 @@ num_sequences_per_action_train = 1
 ##
 hidden_size = 114
 num_layers = 2
-output_dir_name = 'MCCV_f1_dist_msad_'+data_set_name+'_Bayesian_RNN'
+output_dir_name = 'MCCV_f1_dist_ldj_'+data_set_name+'_Bayesian_RNN'
 #space.append(Integer(75,125,name='arch_dict:hidden_size'))
 #space.append(Integer(2,5,name='arch_dict:num_layers'))
 
@@ -36,8 +36,9 @@ fold_start = 0
 fold_end = 50
 fold_list = list(np.arange(fold_start,fold_end,1))
 fold_num = tuple(fold_list)
-scoring_method = 'f1_dist_msad:ff'
+scoring_method = 'f1_dist_ldj:ff'
 score_rate = int(num_epochs*.1)
+init_t = 0
 ##
 people = [0]
 seq_len = 100

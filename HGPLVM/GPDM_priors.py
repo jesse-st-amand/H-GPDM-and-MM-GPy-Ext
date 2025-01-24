@@ -1,10 +1,7 @@
 import numpy as np
 from GPy.core.parameterization import Parameterized
-from GPy.core.parameterization.priors import Prior
 from GPy.util.linalg import jitchol, symmetrify, dpotri
 from GPy.util.linalg import pdinv, dpotrs
-from paramz.domains import _REAL
-import GPy.kern as kern
 import GPy
 
 class GPDM_prior_base():

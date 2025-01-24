@@ -37,7 +37,7 @@ seq_len = 100
 ##
 people = [0]
 input_dim = 24
-output_dir_name = 'MCCV_f1_dist_msad_'+data_set_name+'_GPDMM_Bayesian_50'
+output_dir_name = 'MCCV_f1_dist_ldj_'+data_set_name+'_GPDMM_Bayesian_50'
 max_iters = 100
 num_folds = 50
 fold_start = 0
@@ -47,7 +47,7 @@ fold_num = tuple(fold_list)
 ind_percentages = np.array([.5])
 num_inducing_latent = 0#tuple(int(seq_len*num_sequences_per_action_train*len(actions)*len(people))*ind_percentages)
 num_inducing_dynamics = tuple(int(seq_len*num_sequences_per_action_train)*ind_percentages)
-scoring_method = 'f1_dist_msad:ff'
+scoring_method = 'f1_dist_ldj:ff'
 score_rate = int(max_iters*.1)
 ##
 

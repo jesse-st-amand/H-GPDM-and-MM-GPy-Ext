@@ -3,17 +3,39 @@ from HGPLVM.GPLVM_node import GPLVM_node as GPNode
 
 class Architecture_Base():
     def __init__(self, arch_dict = {}, **kwargs):
-        self.pred_classes = []
-        self.f1_list = []
-        self.score_list = []
-        self.smoothness_list = []
-        self.iter_list = []
-        self.loss_list = []
         if 'attr_dict' in arch_dict:
             self.attr_dict = arch_dict['attr_dict']
         else:
             self.attr_dict = {}
 
+    def get_results(self, **kwargs):
+        return self.data_set_class.get_results(['Y_pred_denorm_list', 'X_preds', 'X_inferences',
+                                                        'pred_trajs', 'pred_traj_lists', 'Y_train_denorm_list',
+                                                        'Y_test_denorm_list'],
+                                                       self.dynamics.predict_Ys_Xs, self.data_set_class.Y_test_list, init_t=self.attr_dict['init_t'], 
+                                                       seq_len=self.attr_dict['sub_seq_len'],pred_group=self.attr_dict['pred_group'],
+                                                       **kwargs)
+    
+    def get_scores(self, true_sequences, pred_sequences, **kwargs):
+        return self.data_set_class.score(self.attr_dict['sub_seq_len'],
+                                              self.attr_dict['scoring_method'], 
+                                              true_sequences, pred_sequences,
+                                              self.data_set_class.action_IDs_test,
+                                              self.data_set_class.results_dict['pred_trajs'])
+    
+    def get_class_preds(self):
+        return {'pred':self.data_set_class.results_dict['pred_trajs'],
+                                     'gt':self.data_set_class.action_IDs_test}
+    
+    def store_data(self, iteration, score_rate, log_likelihood):
+        if score_rate == 0:
+            pass
+        elif iteration % score_rate == 1 or iteration == 1:
+            self.score(iteration, log_likelihood)
+
+
+
+    
 class HGP_Architecture_Base(Architecture_Base):
     def set_kernels(self,kernel_list):
         self.kernels = kernel_list
@@ -125,11 +147,6 @@ class HGP_arch(HGP_Architecture_Base):
         else:
             return self.dynamics.predict_Ys_Xs(Y, **kwargs)
 
-    def score(self, **kwargs):
-        if self.dynamics is not None:
-            return self.dynamics.score(self.data_set_class.Y_test_list, **self.attr_dict, **kwargs)
-        else:
-            raise NotImplementedError('Score not implemented.')
 
     def set_Y(self):
         raise NotImplementedError
