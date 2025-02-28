@@ -7,36 +7,76 @@ from datetime import datetime
 import io
 
 
-def process_file(filepath):
+def find_best_iteration(filepath):
+    """First pass to find best iteration based on validation data"""
     with open(filepath, 'r') as file:
         content = file.read()
 
     parts = content.split('--- ITERATION RESULTS ---')
     second_table = pd.read_csv(io.StringIO(parts[1].strip()))
-
-    print(f"Processing file: {filepath}")
-    print(f"Raw data (first 5 rows):\n{second_table[['iteration', 'score', 'f1', 'smoothness', 'avg_freeze']].head()}")
-
+    
+    # Filter for validation rows
+    validation_rows = second_table[second_table['label'] == 'validation']
+    
+    if validation_rows.empty:
+        # If no validation data, fall back to all data
+        print(f"Warning: No validation data found in {filepath}. Using all data.")
+        validation_rows = second_table
+    
     # Find the maximum F1 score
-    max_f1 = second_table['f1'].max()
-
+    max_f1 = validation_rows['f1'].max()
+    
     # Filter rows with maximum F1 score
-    max_f1_rows = second_table[second_table['f1'] == max_f1]
+    max_f1_rows = validation_rows[validation_rows['f1'] == max_f1]
+    
+    # Among these rows, find the one with minimum score
+    best_validation_row = max_f1_rows.loc[max_f1_rows['score'].idxmin()]
+    
+    return best_validation_row['iteration']
 
-    # Among the rows with max F1, find the one with minimum score
-    best_row = max_f1_rows.loc[max_f1_rows['score'].idxmin()]
 
-    print(f"Best row:\n{best_row[['iteration', 'score', 'f1', 'smoothness', 'avg_freeze']]}")
+def process_file(filepath):
+    """
+    Process a file using a two-pass approach:
+    1. Find the best iteration based on validation data
+    2. Get test metrics at the best iteration
+    """
+    print(f"Processing file: {filepath}")
+
+    # First pass: find the best iteration based on validation data
+    best_iteration = find_best_iteration(filepath)
+    print(f"Best iteration found: {best_iteration}")
+    
+    # Second pass: get test metrics at the best iteration
+    with open(filepath, 'r') as file:
+        content = file.read()
+
+    parts = content.split('--- ITERATION RESULTS ---')
+    second_table = pd.read_csv(io.StringIO(parts[1].strip()))
+    
+    # Filter for test rows
+    test_rows = second_table[second_table['label'] == 'test'].copy()
+    
+    if test_rows.empty:
+        # If no test data, fall back to all data
+        print(f"Warning: No test data found in {filepath}. Using all data.")
+        test_rows = second_table.copy()
+    
+    # Find the closest iteration to the best one
+    test_rows.loc[:, 'iteration_diff'] = abs(test_rows['iteration'] - best_iteration)
+    closest_test_row = test_rows.loc[test_rows['iteration_diff'].idxmin()]
+    
+    print(f"Using test metrics from iteration {closest_test_row['iteration']}")
+    print(f"Selected test row:\n{closest_test_row[['iteration', 'score', 'f1', 'smoothness', 'avg_freeze']]}")
 
     result = {
-        'score': best_row['score'],
-        'f1': best_row['f1'],
-        'smoothness': best_row['smoothness'],
-        'freeze': best_row['avg_freeze']
+        'score': closest_test_row['score'],
+        'f1': closest_test_row['f1'],
+        'smoothness': closest_test_row['smoothness'],
+        'freeze': closest_test_row['avg_freeze']
     }
 
     print(f"Returned result: {result}")
-
     return result
 
 
@@ -61,7 +101,7 @@ def perform_statistical_test(control_data, test_data, test_type='ttest'):
 
 def run_mccv_analysis(control_path, test_paths, test_type='ttest'):
     control_results = get_model_results(control_path)
-    control_name = os.path.basename(os.path.dirname(control_path))
+    control_name = os.path.basename(control_path)
 
     results = {metric: {} for metric in ['score', 'f1', 'smoothness', 'freeze']}
 
@@ -75,7 +115,7 @@ def run_mccv_analysis(control_path, test_paths, test_type='ttest'):
 
     # Process test models
     for test_path in test_paths:
-        model_name = os.path.basename(os.path.dirname(test_path))
+        model_name = os.path.basename(test_path)
         test_results = get_model_results(test_path)
 
         common_sims = set(control_results.keys()) & set(test_results.keys())

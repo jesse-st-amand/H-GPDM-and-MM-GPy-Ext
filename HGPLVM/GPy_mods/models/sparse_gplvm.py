@@ -6,39 +6,6 @@ import sys
 from .sparse_gp_regression import SparseGPRegression
 from GPy.core import Param
 import numpy as np
-def fourier_basis(N, D, per_seq = False):
-    """
-        Generate a Fourier basis set.
-
-        Parameters:
-        - D (int): Total number of waves (including the constant vector if odd).
-        - N (int): Number of points to generate for each wave.
-
-        Returns:
-        - fourier_basis (numpy array): An array where each column is a basis function.
-        """
-    # Time array from 0 to 2pi
-    t = np.linspace(0, 2 * np.pi, N)
-
-    # Initialize the basis array
-    if D % 2 == 1:
-        # Include the constant vector if D is odd
-        fourier_basis = np.ones((N, D))
-        num_harmonics = (D - 1) // 2
-    else:
-        # Exclude the constant vector if D is even
-        fourier_basis = np.zeros((N, D))
-        num_harmonics = D // 2
-
-    # Fill the basis with sine and cosine functions
-    for i in range(1, num_harmonics + 1):
-        print(i)
-        sine_index = 2 * i - 2 if D % 2 == 0 else 2 * i - 1
-        cosine_index = 2 * i - 1 if D % 2 == 0 else 2 * i
-        fourier_basis[:, sine_index] = np.sin(i * t)  # Sine functions
-        fourier_basis[:, cosine_index] = np.cos(i * t)  # Cosine functions
-
-    return fourier_basis
 
 class SparseGPLVM(SparseGPRegression):
     """

@@ -7,8 +7,8 @@ import pickle  # Add this import
 
 if __name__ == "__main__":
     # Main configuration
-    #data_set_name = 'Bimanual 3D'
-    data_set_name = 'Movements CMU'
+    data_set_name = 'Bimanual 3D'
+    #data_set_name = 'Movements CMU'
 
     if data_set_name == "Bimanual 3D":
         actions = [0, 1, 2, 3, 4]
@@ -17,7 +17,7 @@ if __name__ == "__main__":
         num_sequences_per_action_test = 5
         people = [1]
     elif data_set_name == "Movements CMU":
-        actions = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+        actions = [0, 1, 2, 3, 4, 5, 6, 7]
         num_sequences_per_action_train = 1
         num_sequences_per_action_validation = 2
         num_sequences_per_action_test = 3
@@ -28,7 +28,7 @@ if __name__ == "__main__":
     seq_len = 100
     save_path = 'C:/Users/Jesse/Documents/Python/HGP_concise/DSCs/data/MCCV/' + data_set_name + '/'
 
-    num_folds = 2  # 5 * (num_sequences_per_action_train + num_sequences_per_action_test)
+    num_folds = 50  # 5 * (num_sequences_per_action_train + num_sequences_per_action_test)
     fold_num = 0
     data_set_class_list = []
 

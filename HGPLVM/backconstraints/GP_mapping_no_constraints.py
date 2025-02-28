@@ -16,8 +16,8 @@ class No_BC(BC_Base):
 
     def initialize_Y(self):
         self.Y = self.GPNode.Y
-        self.Y1 = self.Y[:, self.param_dict['Y1 indices']]
-        self.Y2 = self.Y[:, self.param_dict['Y2 indices']]
+        #self.Y1 = self.Y[:, self.param_dict['Y1 indices']]
+        #self.Y2 = self.Y[:, self.param_dict['Y2 indices']]
 
     def get_X(self):
         return self.X

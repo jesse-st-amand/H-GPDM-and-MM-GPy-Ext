@@ -1,0 +1,50 @@
+Parameter,Optimized Value
+model_type,gpdm
+pred_group,0
+seq_len,100
+pred_seq_len_ratio,0.4
+max_iters,100
+name,X1_Y1
+pred_group,0
+init_t,0
+sub_seq_len,40
+scoring_method,f1_frechet_ldj:ff
+max_iters,100
+score_rate,10
+input_dim,34
+init,kernel pca:rbf
+opt,lbfgsb
+max_iters,100
+GPNode_opt,False
+kernel,"  [1msum.            [0;0m  |                value  |  constraints  |  priors
+  [1mrbf.variance    [0;0m  |                  1.0  |      +ve      |        
+  [1mrbf.lengthscale [0;0m  |                (34,)  |      +ve      |        
+  [1mlinear.variances[0;0m  |                (34,)  |      +ve      |        
+  [1mbias.variance   [0;0m  |  0.13533528323661267  |      +ve      |        "
+num_inducing_latent,250.0
+num_inducing_dynamics,50.0
+type,map geo
+geometry,fourier_basis
+geo params,10
+num_epochs,100
+num_acts,5
+constraints-0,
+ARD,False
+mapping,GPLVM
+data_set_class,<DSCs.data_set_classes.Bimanual3D object at 0x000001818BC42840>
+X_init,
+name,GPDMM
+name,ff
+order,1
+actions,"[""box_lift"", ""box_turn_cw_forward"", ""box_lateral_left"", ""bread_cutting_right"", ""jar_opening_right_open""]"
+people,[1]
+
+--- ITERATION RESULTS ---
+
+iteration,score,loss,predicted classes,f1,smoothness,avg_freeze,label
+2,0.2039815841260948,95287.92831126969,"{'pred': [0, 0, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4], 'gt': [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4]}",0.8254545454545454,0.8254460306405167,1.6814142137529728,validation
+2,0.21239174338382236,95287.92831126969,"{'pred': [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4], 'gt': [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4]}",1.0,0.8176713871363447,1.5881568918603677,test
+11,0.21202426384368805,95287.92831126969,"{'pred': [0, 0, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4], 'gt': [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4]}",0.8254545454545454,0.8275844137410465,1.7412968020738924,validation
+11,0.22286694891072328,95287.92831126969,"{'pred': [0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4], 'gt': [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4]}",0.9595959595959596,0.8212216759004248,1.647189374800525,test
+21,0.21202503428489342,95287.92831126969,"{'pred': [0, 0, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4], 'gt': [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4]}",0.8254545454545454,0.8275846164767762,1.7413024811722095,validation
+21,0.2228671171622189,95287.92831126969,"{'pred': [0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4], 'gt': [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4]}",0.9595959595959596,0.8212216373658605,1.6471953600977474,test

@@ -1,0 +1,52 @@
+Parameter,Optimized Value
+model_type,gpdm
+pred_group,0
+seq_len,100
+pred_seq_len_ratio,0.15
+max_iters,100
+name,X1_Y1
+pred_group,0
+init_t,0
+sub_seq_len,15
+scoring_method,f1_frechet_ldj:ff
+max_iters,100
+score_rate,10
+input_dim,9
+init,PCA
+opt,lbfgsb
+max_iters,100
+GPNode_opt,False
+kernel,"  [1msum.            [0;0m  |                  value  |  constraints  |  priors
+  [1mrbf.variance    [0;0m  |  5.809195307766043e-09  |      +ve      |        
+  [1mrbf.lengthscale [0;0m  |                   (9,)  |      +ve      |        
+  [1mlinear.variances[0;0m  |                   (9,)  |      +ve      |        
+  [1mbias.variance   [0;0m  |    0.06440411299615856  |      +ve      |        "
+num_inducing_latent,0
+num_inducing_dynamics,0
+type,map geo
+geometry,fourier_basis
+geo params,9
+num_epochs,100
+num_acts,8
+constraints-0,variance
+constraints-1,A
+constraints-2,R
+constraints-3,n
+constraints-4,r
+ARD,False
+mapping,GPLVM
+data_set_class,<DSCs.data_set_classes.MovementsCMU object at 0x0000023C765D0470>
+X_init,
+name,GPDMM
+name,ff
+order,1
+actions,"[""bend_down"", ""soccer_kick"", ""breaststroke"", ""flystroke"", ""jump_side"", ""left_front_kick"", ""left_lunges"", ""left_punches""]"
+people,[0]
+
+--- ITERATION RESULTS ---
+
+iteration,score,loss,predicted classes,f1,smoothness,avg_freeze,label
+1,0.3940373809544587,0,"{'pred': [0, 0, 7, 7, 7, 7, 0, 0, 7, 7, 0, 0, 7, 7, 7, 7], 'gt': [0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7]}",0.10416666666666666,0.848573301545436,1.3053618033493573,validation
+1,0.3930879734887265,0,"{'pred': [0, 0, 0, 7, 7, 7, 7, 7, 7, 7, 2, 7, 7, 7, 7, 0, 0, 7, 7, 7, 7, 7, 7, 7], 'gt': [0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 7]}",0.12946428571428573,0.8719088781790894,1.1731804880722199,test
+11,0.3293983948887357,67562.02914988065,"{'pred': [0, 0, 6, 4, 2, 2, 3, 3, 4, 4, 5, 5, 4, 4, 3, 1], 'gt': [0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7]}",0.5464285714285714,0.7845773218483094,1.0347392236896251,validation
+11,0.30367847869631986,67562.02914988065,"{'pred': [0, 0, 0, 1, 1, 4, 3, 3, 3, 0, 3, 3, 4, 4, 6, 5, 5, 5, 4, 6, 1, 5, 1, 1], 'gt': [0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 7]}",0.4607142857142857,0.8077530026698222,0.9909425073561589,test

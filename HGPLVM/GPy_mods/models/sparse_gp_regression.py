@@ -56,10 +56,10 @@ class SparseGPRegression(SparseGP_MPI):
             #from ..inference.latent_function_inference.var_dtc_parallel import VarDTC_minibatch
             infr = VarDTC_minibatch(mpi_comm=mpi_comm)
         else:
-            #infr = FITC()
-            from GPy.inference.latent_function_inference.var_dtc import VarDTC
-            from GPy.inference.latent_function_inference.dtc import DTC
-            infr = VarDTC(limit=3)
+            infr = FITC()
+            #from GPy.inference.latent_function_inference.var_dtc import VarDTC
+            #from GPy.inference.latent_function_inference.dtc import DTC
+            #infr = VarDTC(limit=3)
 
         SparseGP_MPI.__init__(self, X, Y, Z, kernel, likelihood, mean_function=mean_function,
         inference_method=infr, normalizer=normalizer, mpi_comm=mpi_comm, name=name)

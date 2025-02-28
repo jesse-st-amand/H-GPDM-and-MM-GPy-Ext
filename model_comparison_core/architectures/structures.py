@@ -56,16 +56,19 @@ class Evaluation_Base():
         self.freeze_list = []
         self.iter_list = []
         self.loss_list = []
+        self.label_list = []
         self.results_dict = {}
+        
 
     def scores_append_and_print(self, scores, epoch, loss, label, action_IDs):
         self.pred_classes.append(self.get_class_preds(label, action_IDs))
         self.score_list.append(scores['avg_norm_distance'])
         self.f1_list.append(scores['f1'])
-        self.smoothness_list.append(scores['avg_norm_smoothness'])
+        self.smoothness_list.append(scores['avg_smoothness'])
         self.freeze_list.append(scores['avg_freeze'])
         self.iter_list.append(epoch)
         self.loss_list.append(loss)
+        self.label_list.append(label)
 
         print('')
         print('SCORES: ')
@@ -73,8 +76,8 @@ class Evaluation_Base():
         print(scores['avg_norm_distance'])
         print('f1: ')
         print(scores['f1'])
-        print('avg_norm_smoothness: ')
-        print(scores['avg_norm_smoothness'])
+        print('avg_smoothness: ')
+        print(scores['avg_smoothness'])
         print('avg_freeze: ')
         print(scores['avg_freeze'])
         
@@ -146,6 +149,117 @@ class X1_Y1(HGP_arch, Evaluation_Base):
         self.set_dynamics(self.top_node_dict['prior_dict']['dynamics_dict'])
         top_node.set_prior(prior_dict=self.top_node_dict['prior_dict'], num_seqs=self.data_set_class.sub_num_actions)
         self.GPNode_init_opt(top_node, self.top_node_dict['attr_dict']['opt'], self.top_node_dict['attr_dict']['max_iters'],self.top_node_dict['attr_dict']['GPNode_opt'])
+        self.model = HGPLVM(top_node, self)
+
+    def set_Y(self, data_set_class):
+        self.Y = data_set_class.Y_train
+        self.N, self.D = self.Y.shape
+
+    def IF_setup(self):
+        return self.IF_general(self.HGP.arch.dynamics.Y_pred_CCs, self.data_set_class.Y_test_CCs)
+
+    def IF_general(self, prediction, ground_truth):
+        IFs = []
+        for i, (Y_p_SD, Y_k_SD) in enumerate(zip(prediction, ground_truth)):
+            IFs.append(self.data_set_class.IFs_func([Y_k_SD, Y_p_SD]))
+        return IFs
+    
+class X1_H1_Y1(HGP_arch, Evaluation_Base):
+    def __init__(self, HGP, data_set_class, arch_dict = {}, **kwargs):
+        if 'top_node_dict' in arch_dict:
+            self.top_node_dict = arch_dict['top_node_dict']
+        else:
+            self.top_node_dict = {}
+        if 'H1_node_dict' in arch_dict:
+            self.H1_node_dict = arch_dict['H1_node_dict']
+        else:
+            self.H1_node_dict = {}
+
+        temp_top_node_dict = {
+            'BC_dict': {
+                'X_init': None,
+            },
+            'prior_dict': {},
+            'kernel': None,
+            'input_dim': None,
+            'init': None,
+            'opt': None
+        }
+
+        temp_H1_node_dict = {
+            'BC_dict': {
+                'X_init': None,
+            },
+            'prior_dict': {},
+            'kernel': None,
+            'input_dim': None,
+            'init': None,
+            'opt': None
+        }
+
+        super().__init__(HGP, data_set_class, arch_dict, **kwargs)
+        Evaluation_Base.__init__(self)
+        self.merge_dicts(temp_top_node_dict, self.top_node_dict)
+        self.merge_dicts(temp_H1_node_dict, self.H1_node_dict)
+
+    def set_up(self, data_set_class):
+        super().set_up(data_set_class)
+        # Validate input dimensions
+        if self.top_node_dict['attr_dict']['input_dim'] is None or self.H1_node_dict['attr_dict']['input_dim'] is None:
+            raise ValueError('Input dimensions must be set before building this architecture.')
+
+        # Set up kernels if not provided
+        if self.H1_node_dict['attr_dict']['kernel'] is None:
+            self.H1_node_dict['attr_dict']['kernel'] = (kern.RBF(self.H1_node_dict['attr_dict']['input_dim'], 1, ARD=True) +
+                                                    kern.Linear(self.H1_node_dict['attr_dict']['input_dim'], ARD=True) +
+                                                    kern.Bias(self.H1_node_dict['attr_dict']['input_dim'], np.exp(-2)))
+        if self.top_node_dict['attr_dict']['kernel'] is None:
+            self.top_node_dict['attr_dict']['kernel'] = (kern.RBF(self.top_node_dict['attr_dict']['input_dim'], 1, ARD=True) +
+                                                    kern.Linear(self.top_node_dict['attr_dict']['input_dim'], ARD=True) +
+                                                    kern.Bias(self.top_node_dict['attr_dict']['input_dim'], np.exp(-2)))
+
+        # Set default initializations if not provided
+        if self.H1_node_dict['attr_dict']['init'] is None:
+            self.H1_node_dict['attr_dict']['init'] = 'random'
+        if self.top_node_dict['attr_dict']['init'] is None:
+            self.top_node_dict['attr_dict']['init'] = 'random'
+
+        # Set default optimizers if not provided
+        if self.H1_node_dict['attr_dict']['opt'] is None:
+            self.H1_node_dict['attr_dict']['opt'] = 'lbfgsb'
+        if self.top_node_dict['attr_dict']['opt'] is None:
+            self.top_node_dict['attr_dict']['opt'] = 'lbfgsb'
+
+        # Set up data set class references
+        self.H1_node_dict['BC_dict']['data_set_class'] = self.data_set_class
+        self.top_node_dict['BC_dict']['data_set_class'] = self.data_set_class
+
+        if self.data_set_class.X_init is not None:
+            self.top_node_dict['BC_dict']['X_init'] = self.data_set_class.X_init[:,:self.top_node_dict['attr_dict']['input_dim']]
+            self.H1_node_dict['BC_dict']['X_init'] = self.data_set_class.X_init[:,:self.H1_node_dict['attr_dict']['input_dim']]
+        else:
+            self.top_node_dict['BC_dict']['X_init'] = None
+            self.H1_node_dict['BC_dict']['X_init'] = None
+
+        # Initialize H1 node
+        H_Y = GPNode(self.Y, self.H1_node_dict['attr_dict'], seq_eps=self.data_set_class.seq_eps_train,
+                     num_types_seqs=self.data_set_class.num_train_seqs_per_subj_per_act, **self.H1_node_dict['attr_dict'])
+        H_Y.set_backconstraint(BC_dict=self.H1_node_dict['BC_dict'])
+        H_Y.initialize_X(self.H1_node_dict['attr_dict']['init'], Y=self.Y, X=self.H1_node_dict['BC_dict']['X_init'])
+        #self.set_dynamics(self.H1_node_dict['prior_dict']['dynamics_dict'])
+        #H_Y.set_prior(prior_dict=self.H1_node_dict['prior_dict'], num_seqs=self.data_set_class.sub_num_actions)
+        #self.GPNode_init_opt(H_Y, self.H1_node_dict['attr_dict']['opt'], self.H1_node_dict['attr_dict']['max_iters'], self.H1_node_dict['attr_dict']['GPNode_opt'])
+
+        # Initialize top node
+        top_node = GPNode(H_Y.X.values, self.top_node_dict['attr_dict'], seq_eps=self.data_set_class.seq_eps_train,
+                         num_types_seqs=self.data_set_class.num_train_seqs_per_subj_per_act, **self.top_node_dict['attr_dict'])
+        top_node.SetChild(0, H_Y)
+        top_node.set_backconstraint(BC_dict=self.top_node_dict['BC_dict'])
+        top_node.initialize_X(self.top_node_dict['attr_dict']['init'], Y=H_Y.X.values, X=self.top_node_dict['BC_dict']['X_init'])
+        self.set_dynamics(self.top_node_dict['prior_dict']['dynamics_dict'])
+        top_node.set_prior(prior_dict=self.top_node_dict['prior_dict'], num_seqs=self.data_set_class.sub_num_actions)
+        #self.GPNode_init_opt(top_node, self.top_node_dict['attr_dict']['opt'], self.top_node_dict['attr_dict']['max_iters'], self.top_node_dict['attr_dict']['GPNode_opt'])
+
         self.model = HGPLVM(top_node, self)
 
     def set_Y(self, data_set_class):
@@ -470,9 +584,10 @@ class TransformerMotionModel(nn.Module, Evaluation_Base, Architecture_Base):
             # Backpropagation and optimization
             loss.backward()
             optimizer.step()
-
-            start = self.store_data(epoch, score_rate, num_epochs, loss.item(), start, Y_true_list, Y_true_CCs)
-        return self.score(Y_true_list, Y_true_CCs, iters=num_epochs, loss=loss.item())
+    
+            self.store_data(epoch, score_rate, num_epochs, loss.item(), self.data_set_class.Y_validation_list, self.data_set_class.Y_validation_CCs, self.data_set_class.action_IDs_validation,'validation')
+            self.store_data(epoch, score_rate, num_epochs, loss.item(), self.data_set_class.Y_test_list, self.data_set_class.Y_test_CCs, self.data_set_class.action_IDs_test,'test')
+        return self.score(self.data_set_class.Y_test_list, self.data_set_class.Y_test_CCs, 'test', num_epochs, loss.item(), self.data_set_class.action_IDs_test,)
 
 
     def predict_Ys_Xs(self, Y_test_list, init_t, seq_len=10, **kwargs):
@@ -611,8 +726,9 @@ class SequenceClassifier(nn.Module, Evaluation_Base, Architecture_Base):
             loss.backward()
             optimizer.step()
 
-            start = self.store_data(epoch, score_rate, num_epochs, loss.item(), start, Y_true_list, Y_true_CCs)
-        return self.score(Y_true_list, Y_true_CCs, iters=num_epochs, loss=loss.item())
+            self.store_data(epoch, score_rate, num_epochs, loss.item(), self.data_set_class.Y_validation_list, self.data_set_class.Y_validation_CCs, self.data_set_class.action_IDs_validation,'validation')
+            self.store_data(epoch, score_rate, num_epochs, loss.item(), self.data_set_class.Y_test_list, self.data_set_class.Y_test_CCs, self.data_set_class.action_IDs_test,'test')
+        return self.score(self.data_set_class.Y_test_list, self.data_set_class.Y_test_CCs, 'test', num_epochs, loss.item(), self.data_set_class.action_IDs_test,)
 
     '''def predict_Ys_Xs(self, Y_test_list, init_t, seq_len=10, **kwargs):
         num_seqs = len(Y_test_list)

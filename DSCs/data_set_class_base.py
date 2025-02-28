@@ -446,9 +446,11 @@ class DataSetClassMovementBase(DataSetClassSequencesBase):
             return self.score_dynamic(sample_len, subtype, Y1, Y2, Y1_ID, Y2_ID)
         elif type == 'f1_dist_msad':
             return self.score_f1_dist_msad(sample_len, Y1, Y2, Y1_ID, Y2_ID)
-        elif type == 'f1_dist_ldj':
+        elif type == 'f1_frechet_ldj':
             return score_f1_dist_smoothness(sample_len, Y1, Y2, Y1_ID, Y2_ID, distance_metric='frechet', smoothness_metric='ldj')
-        elif type == 'f1_dist_sparc':
+        elif type == 'f1_dtw_mse_ldj':
+            return score_f1_dist_smoothness(sample_len, Y1, Y2, Y1_ID, Y2_ID, distance_metric='dtw_mse', smoothness_metric='ldj')
+        elif type == 'f1_frechet_sparc':
             return score_f1_dist_smoothness(sample_len, Y1, Y2, Y1_ID, Y2_ID, distance_metric='frechet', smoothness_metric='sparc')
         elif type == 'static':
             # self.score_static()

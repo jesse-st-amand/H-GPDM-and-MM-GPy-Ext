@@ -132,12 +132,16 @@ class HGPLVM(Model):
             self.update_hierarchy(child)
             Ys.append(child.X.values)
         if children:
-            print('WARNING: Hierarchical model may need revision. Look at the ordering of the parameters')
+            if len(Ys) > 1:
+                print('WARNING: Hierarchical model may need revision. Look at the ordering of the parameters')
             GPNode.set_Y(np.hstack(Ys))
         #self.grad_dict[str(GPNode.node_nID)] = GPNode.gradient
         GPNode.parameters_changed()
 
-        self.arch.store_data(self.learning_n, self.arch.attr_dict['score_rate'], self.ObjFunVal)
+        self.arch.store_data(self.learning_n, self.arch.attr_dict['score_rate'], self.ObjFunVal, self.arch.data_set_class.Y_validation_list, self.arch.data_set_class.Y_validation_CCs, self.arch.data_set_class.action_IDs_validation,'validation')
+        self.arch.store_data(self.learning_n, self.arch.attr_dict['score_rate'], self.ObjFunVal, self.arch.data_set_class.Y_test_list, self.arch.data_set_class.Y_test_CCs, self.arch.data_set_class.action_IDs_test,'test')
+
+
         self.learning_n += 1
         #self.grad_dict[str(GPNode.node_nID)] = GPNode.gradient
 

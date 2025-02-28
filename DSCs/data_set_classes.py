@@ -46,7 +46,6 @@ class MovementsCMU(DataSetClassMovementBase):
             actions=[
                 'bend_down',
                 'soccer_kick',
-                'jump',
                 'breaststroke',
                 'flystroke',
                 'jump_side',

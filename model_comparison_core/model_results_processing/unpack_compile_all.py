@@ -36,7 +36,7 @@ def unpack_directory(source_dir):
 def process_model(model_name, model_summaries_sub_dir, grouping_params,smoothness_metric):
     base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-    base_path = base_dir + '/HGPLVM_output_repository/model_summaries/' + model_summaries_sub_dir
+    base_path = base_dir + '/output_repository/model_summaries/' + model_summaries_sub_dir
 
     print(f"Processing model: {model_name}")
     print(f"Importing parameters from: model_comparison_core.model_parameters.{model_name}")
@@ -67,7 +67,7 @@ def process_model(model_name, model_summaries_sub_dir, grouping_params,smoothnes
 
     # Output directory
     output_base = os.path.abspath(
-        base_dir+r'\HGPLVM_output_repository\compiled_model_summaries')
+        base_dir+r'\output_repository\compiled_model_summaries')
     output_path = os.path.join(output_base, os.path.basename(unpacked_dir))
 
     print(f"Creating output directory: {output_path}")
@@ -93,7 +93,7 @@ def main():
     smoothness_metric = 'smoothness'
     models = [
         {
-            'name': 'GPDM_MCCV_'+data_set+'_50',
+            'name': 'GPDM_MCCV_50'+data_set,
             'model_summaries_sub_dir': model_summaries_sub_dir,
             'grouping_params': ['input_dim']
         },

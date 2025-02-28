@@ -31,12 +31,16 @@ class Geometric_BC_base():
         elif geometry_name.lower() == 'sine':
             from HGPLVM.backconstraints.geometries import sine
             self.geometry = sine(self)
+        elif geometry_name.lower() == 'random_sine_waves':
+            from HGPLVM.backconstraints.geometries import random_sine_waves
+            self.geometry = random_sine_waves(self)
         elif geometry_name.lower() == 'sphere':
+
             from HGPLVM.backconstraints.geometries import sphere
             self.geometry = sphere(self)
-        elif geometry_name.lower() == 'spiral':
-            from HGPLVM.backconstraints.geometries import spiral
-            self.geometry = spiral(self)
+        elif geometry_name.lower() == 'cocentric_circles':
+            from HGPLVM.backconstraints.geometries import cocentric_circles
+            self.geometry = cocentric_circles(self)
         elif geometry_name.lower() == 'torus':
             from HGPLVM.backconstraints.geometries import torus
             self.geometry = torus(self)
@@ -52,8 +56,7 @@ class Geometric_BC_base():
         elif geometry_name.lower() == 'ep hands toroid':
             from HGPLVM.backconstraints.geometries import EP_hands_toroid_geometry
             self.geometry = EP_hands_toroid_geometry(self)
-
-        elif geometry_name.lower() == 'fourier':
+        elif geometry_name.lower() == 'fourier_basis':
             from HGPLVM.backconstraints.geometries import fourier
             self.geometry = fourier(self, param_dict['geo params'])
         elif geometry_name.lower() == 'wavelet_basis':
@@ -117,7 +120,7 @@ class Geometric_BC_base():
     def constrain_params(self):
         for con in self.param_dict['constraints']:
             for param in self.parameters:
-                if con == param.name:
+                if con == param.name.split('_')[0]:
                     param.constrain_fixed()
         super().constrain_params()
 

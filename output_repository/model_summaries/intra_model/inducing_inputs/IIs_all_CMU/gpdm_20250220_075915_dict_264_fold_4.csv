@@ -1,0 +1,50 @@
+Parameter,Optimized Value
+model_type,gpdm
+pred_group,0
+seq_len,100
+pred_seq_len_ratio,0.15
+max_iters,100
+name,X1_Y1
+pred_group,0
+init_t,0
+sub_seq_len,15
+scoring_method,f1_frechet_ldj:ff
+max_iters,100
+score_rate,10
+input_dim,9
+init,PCA
+opt,lbfgsb
+max_iters,100
+GPNode_opt,False
+kernel,"  [1msum.            [0;0m  |                   value  |  constraints  |  priors
+  [1mrbf.variance    [0;0m  |  1.1300541733137798e-17  |      +ve      |        
+  [1mrbf.lengthscale [0;0m  |                    (9,)  |      +ve      |        
+  [1mlinear.variances[0;0m  |                    (9,)  |      +ve      |        
+  [1mbias.variance   [0;0m  |   0.0021022577167078087  |      +ve      |        "
+num_inducing_latent,400.0
+num_inducing_dynamics,0.0
+type,map geo
+geometry,fourier_basis
+geo params,6
+num_epochs,100
+num_acts,8
+constraints-0,
+ARD,False
+mapping,GPLVM
+data_set_class,<DSCs.data_set_classes.MovementsCMU object at 0x000001E7536E63F0>
+X_init,
+name,GPDMM
+name,ff
+order,1
+actions,"[""bend_down"", ""soccer_kick"", ""breaststroke"", ""flystroke"", ""jump_side"", ""left_front_kick"", ""left_lunges"", ""left_punches""]"
+people,[0]
+
+--- ITERATION RESULTS ---
+
+iteration,score,loss,predicted classes,f1,smoothness,avg_freeze,label
+1,0.20038708882723225,0,"{'pred': [0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 7, 7, 6, 6, 7, 7], 'gt': [0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7]}",0.8333333333333333,0.7300632747772465,1.549501051847584,validation
+1,0.22868956751544303,0,"{'pred': [0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 7, 7, 5, 6, 6, 6, 7, 7, 7], 'gt': [0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 7]}",0.90625,0.7375972562491468,2.399613447177257,test
+11,0.22289369043869248,62159.53673017544,"{'pred': [0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7], 'gt': [0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7]}",1.0,0.7249090366885323,1.9834476488001291,validation
+11,0.23093645175966,62159.53673017544,"{'pred': [0, 0, 0, 1, 1, 1, 2, 3, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 7], 'gt': [0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 7]}",0.9571428571428572,0.7325584297163207,1.967392614414305,test
+21,10.619339944540826,35336.03779457085,"{'pred': [3, 3, 3, 7, 2, 2, 3, 3, 3, 3, 6, 3, 6, 3, 7, 7], 'gt': [0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7]}",0.3329545454545455,1.033489942558622,0.3208136898470933,validation
+21,23.38426936955814,35336.03779457085,"{'pred': [3, 3, 3, 3, 3, 3, 2, 2, 2, 3, 2, 3, 3, 3, 3, 3, 7, 3, 0, 3, 7, 3, 3, 3], 'gt': [0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 7]}",0.13214285714285715,1.1805974207271357,0.2422405979153066,test

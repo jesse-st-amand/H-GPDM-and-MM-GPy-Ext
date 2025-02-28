@@ -13,9 +13,9 @@ class BC_Base(Mapping):
     def __init__(self, GPNode, output_dim, param_dict, name=''):
         self.GPNode = GPNode
         self.param_dict = param_dict
+        self.output_dim = output_dim
         self.initialize_Y()
         self.N, self.input_dim = self.Y.shape
-        self.output_dim = output_dim
         self.initialize_X(self.param_dict['X_init'] )
         super(BC_Base, self).__init__(input_dim=self.input_dim, output_dim=output_dim, name=name)
         self.construct_mapping()
@@ -40,61 +40,6 @@ class BC_Base(Mapping):
         else:
             self.X = X_init
 
-    '''def f_new(self, Y_new, pred_group, **kwargs):
-        if self.param_dict['mapping'] == 'GP':
-            if pred_group == 0:
-                if self.first_calls[0]:
-                    kern = GPy.kern.RBF(self.Y.shape[1], ARD=False)
-                    self.GP0 = GPy.models.GPRegression(self.Y, self.GPNode.X.values, kern)
-                    self.GP0.optimize(messages=True, max_f_eval=1000)
-                    self.first_calls[0] = False
-                return self.GP0.predict_noiseless(Y_new)[0]
-            elif pred_group == 1:
-                if self.first_calls[1]:
-                    kern = GPy.kern.RBF(self.Y1.shape[1], ARD=False)
-                    self.GP1 = GPy.models.GPRegression(self.Y1, self.GPNode.X.values, kern)
-                    self.GP1.optimize(messages=True, max_f_eval=1000)
-                    self.first_calls[1] = False
-                return self.GP1.predict_noiseless(Y_new)[0]
-            elif pred_group == 2:
-                if self.first_calls[2]:
-                    kern = GPy.kern.RBF(self.Y2.shape[1], ARD=False)
-                    self.GP2 = GPy.models.GPRegression(self.Y2, self.GPNode.X.values, kern)
-                    self.GP2.optimize(messages=True, max_f_eval=1000)
-                    self.first_calls[2] = False
-                return self.GP2.predict_noiseless(Y_new)[0]
-        elif self.param_dict['mapping'] == 'BC':
-            return self.BC_f_new(Y_new, pred_group, **kwargs)
-        else:
-            raise ValueError('Wrong mapping type.')
-
-    def f_new(self, Y_new, pred_group, **kwargs):
-        if self.param_dict['mapping'] == 'GP':
-            # GP model logic as previously defined
-            pass
-        elif self.param_dict['mapping'] == 'RF':  # Random Forest logic
-            if pred_group == 0:
-                Y_group = self.Y
-            elif pred_group == 1:
-                Y_group = self.Y1
-            elif pred_group == 2:
-                Y_group = self.Y2
-            else:
-                raise ValueError("Invalid prediction group.")
-
-            # Initialize RF model if first call
-            if self.first_calls[pred_group]:
-                # Assuming X values are features and Y_group are the targets
-                self.models[pred_group] = RandomForestRegressor(n_estimators=100, random_state=42)
-                self.models[pred_group].fit(Y_group,self.GPNode.X.values)
-                self.first_calls[pred_group] = False
-
-            # Predict from the model
-            return self.models[pred_group].predict(Y_new)  # Reshape Y_new for a single prediction
-        elif self.param_dict['mapping'] == 'BC':
-            return self.BC_f_new(Y_new, pred_group, **kwargs)
-        else:
-            raise ValueError('Wrong mapping type.')'''
 
     def f_new(self, Y_new, pred_group, **kwargs):
         # Validate and select the appropriate data based on the pred_group

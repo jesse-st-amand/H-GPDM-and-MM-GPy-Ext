@@ -112,7 +112,7 @@ def write_comp_dict(kwargs):
             'arch_dict': {
                 'model_type': kwargs['model_type'],  # or use model_type variable
                 'input_size': kwargs['D'],
-                'num_classes': kwargs['num_classes'],
+                'num_classes': len(kwargs['actions']),
                 'hidden_size_multiplier': kwargs['hidden_size_multiplier'],
                 'num_layers': kwargs['num_layers'],
                 'num_heads': kwargs['num_heads'],
@@ -133,7 +133,7 @@ def write_comp_dict(kwargs):
             'arch_dict': {
                 'model_type': kwargs['model_type'],
                 'input_size': kwargs['D'],
-                'num_classes': kwargs['num_classes'],
+                'num_classes': len(kwargs['actions']),
                 'hidden_size': kwargs['hidden_size'],
                 'num_layers': kwargs['num_layers'],
                 'sample_len': kwargs['sample_len'],
@@ -151,7 +151,7 @@ def write_comp_dict(kwargs):
             'arch_dict': {
                 'model_type': kwargs['model_type'],
                 'input_size': kwargs['D'],
-                'num_classes': kwargs['num_classes'],
+                'num_classes': len(kwargs['actions']),
                 'hidden_size': kwargs['hidden_size'],
                 'latent_size': kwargs['latent_size'],
                 'sample_len': kwargs['sample_len'],
@@ -160,10 +160,10 @@ def write_comp_dict(kwargs):
                 'init_t': kwargs['init_t'],
             }
         }
-    elif kwargs['model_type'].lower() == 'gpdm':
+    elif kwargs['model_type'].lower() == 'gpdm': #X1_Y1
         dynamics_dict = {'name': kwargs['prior_dynamics'], 'Y_indices': kwargs['Y_indices']}
 
-        BC_dict = {'type': kwargs['bc_name'], 'geometry': kwargs['geometry'], 'num_epochs': kwargs['num_epochs'],
+        BC_dict = {'type': kwargs['bc_name'], 'geometry': kwargs['geometry'],'geo params': kwargs['geo_params'], 'num_epochs': kwargs['num_epochs'],
                    'Y1 indices': kwargs['Y_indices'][0], 'Y2 indices': kwargs['Y_indices'][1], 'Y3 indices': kwargs['Y_indices'][2],
                    'num_acts': len(kwargs['actions']), 'constraints': kwargs['BC_param_constraints'],
                    'ARD': kwargs['ARD'], 'mapping': kwargs['mapping']}
@@ -182,11 +182,63 @@ def write_comp_dict(kwargs):
             'prior_dict': prior_dict}
 
         arch_dict = {
-            'attr_dict': {'name': kwargs['arch_type'], 'Y_indices': kwargs['Y_indices'], 'pred_group': kwargs['pred_group'],
+            'attr_dict': {'name': 'X1_Y1', 'Y_indices': kwargs['Y_indices'], 'pred_group': kwargs['pred_group'],
                           'init_t': kwargs['init_t'], 'sub_seq_len': kwargs['pred_seq_len'],
-                          'scoring_method':kwargs['scoring_method'],'score_rate': kwargs['score_rate']
+                          'scoring_method':kwargs['scoring_method'],'max_iters': kwargs['max_iters'],'score_rate': kwargs['score_rate']
                           },
             'top_node_dict': top_node_dict
+            }
+
+        dict = {'attr_dict': {'model_type': kwargs['model_type'],'pred_group': kwargs['pred_group'], 'seq_len': kwargs['seq_len'],
+                                  'pred_seq_len_ratio': kwargs['pred_seq_len_ratio'], 'max_iters': kwargs['max_iters']},
+                    'arch_dict': arch_dict}
+    elif kwargs['model_type'].lower() == 'x1_h1_y1':
+        dynamics_dict = {'name': kwargs['prior_dynamics'], 'Y_indices': kwargs['Y_indices']}
+
+        BC_dict = {'type': kwargs['bc_name'], 'geometry': kwargs['geometry'],'geo params': kwargs['geo_params'], 'num_epochs': kwargs['num_epochs'],
+                   'Y1 indices': kwargs['Y_indices'][0], 'Y2 indices': kwargs['Y_indices'][1], 'Y3 indices': kwargs['Y_indices'][2],
+                   'num_acts': len(kwargs['actions']), 'constraints': kwargs['BC_param_constraints'],
+                   'ARD': kwargs['ARD'], 'mapping': kwargs['mapping']}
+        prior_dict = {'name': kwargs['prior_name'], 'dynamics_dict': dynamics_dict, 'order': kwargs['order']}
+
+        top_node_dict = {'attr_dict': {
+            'input_dim': kwargs['input_dim'],
+            'init': kwargs['init1'],
+            'opt': kwargs['opt1'],
+            'max_iters': kwargs['max_iters'],
+            'GPNode_opt': kwargs['GPNode_opt'],
+            'kernel': None,
+            'num_inducing_latent': kwargs['num_inducing_latent'],
+            'num_inducing_dynamics': kwargs['num_inducing_dynamics']},
+            'BC_dict': BC_dict,
+            'prior_dict': prior_dict}
+        
+        H1_BC_dict = {'type': kwargs['bc_name2'], 'geometry': kwargs['geometry2'],'geo params': kwargs['geo_params2'], 'num_epochs': kwargs['num_epochs'],
+                        'Y1 indices': kwargs['Y_indices'][0], 'Y2 indices': kwargs['Y_indices'][1], 'Y3 indices': kwargs['Y_indices'][2],
+                        'num_acts': len(kwargs['actions']), 'constraints': kwargs['BC_param_constraints2'],
+                        'ARD': kwargs['ARD'], 'mapping': kwargs['mapping2']}
+
+        H1_node_dict = {'attr_dict': {
+            'input_dim': kwargs['input_dim2'],
+            'init': kwargs['init2'],
+            'opt': kwargs['opt2'],
+            'max_iters': kwargs['max_iters'],
+            'GPNode_opt': kwargs['GPNode_opt'],
+            'kernel': None,
+            'num_inducing_latent': kwargs['num_inducing_latent'],
+            'num_inducing_dynamics': kwargs['num_inducing_dynamics']},
+            'BC_dict': H1_BC_dict,
+            'prior_dict': prior_dict}
+
+        
+
+        arch_dict = {
+            'attr_dict': {'name': 'X1_H1_Y1', 'Y_indices': kwargs['Y_indices'], 'pred_group': kwargs['pred_group'],
+                          'init_t': kwargs['init_t'], 'sub_seq_len': kwargs['pred_seq_len'],
+                          'scoring_method':kwargs['scoring_method'],'max_iters': kwargs['max_iters'],'score_rate': kwargs['score_rate']
+                          },
+            'top_node_dict': top_node_dict,
+            'H1_node_dict': H1_node_dict
             }
 
         dict = {'attr_dict': {'model_type': kwargs['model_type'],'pred_group': kwargs['pred_group'], 'seq_len': kwargs['seq_len'],

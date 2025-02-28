@@ -75,30 +75,23 @@ if __name__ == "__main__":
     current_directory = os.path.dirname(os.path.abspath(__file__))
     parent_directory = os.path.dirname(current_directory)
 
-    param_dir = 'MCCV_AISTATS_ldj'
+    param_dir = 'inter_model'
+    sub_dir = 'ICANN'  
+    temp = False
     names = [
-        #'GPDM_MCCV_BM_IC_testing',
-        #'GPDM_MCCV_BM_50',
-        #'RNN_MCCV_BM',
-        'VAE_MCCV_BM',
-        #'transformer_MCCV_BM',
-        #'GPDM_MCCV_CMU_50',
-        #'RNN_MCCV_CMU',
-        #'VAE_MCCV_CMU',
-        #'transformer_MCCV_CMU',
-        #'VAE_params_singular_ldj',
+        'GPDM_geo_8_MCCV_BM',
     ]
 
     for name in names:
         local_vars = {}
-        string = f'from model_comparison_core.model_parameters.{param_dir+'.'+name} import output_dir_name, num_sims, combined_dicts, comp_tuples, data_tuples, space'
+        string = f'from model_comparison_core.model_parameters.{param_dir+'.'+sub_dir+'.'+name} import num_sims, combined_dicts, comp_tuples, data_tuples, space'
         exec(string, {}, local_vars)
-        dir_path = parent_directory+"/HGPLVM_output_repository/model_summaries/"+param_dir+"/"+name+"/" + local_vars['output_dir_name']
+        dir_path = parent_directory+"/output_repository/model_summaries/"+param_dir+"/"+sub_dir+"/"+name+"/"
         create_directory(dir_path)
 
-        last_processed_index = -1 if dir_path.split('/')[-1].startswith('temp_') else get_last_processed_index(dir_path)
+        last_processed_index = -1 if temp else get_last_processed_index(dir_path)
 
-        num_cores = max(1, psutil.cpu_count() // 2)
+        num_cores = max(1, psutil.cpu_count() - 6)
         batch_size = num_cores
 
         print(f"Starting processing with {num_cores} cores")

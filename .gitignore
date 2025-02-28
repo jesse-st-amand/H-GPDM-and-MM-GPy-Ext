@@ -1,7 +1,8 @@
 # Ignore graphics directory inside HGPLVM
 /DSCs/graphics/npy/
 /DSCs/data/
-
+/output_repository/MCCV/inter_model/ICANN/Bimanual 3D/cumul/
+/output_repository/MCCV/inter_model/ICANN/Movements CMU/cumul/
 *.pyc
 __pycache__/
 *.pyo

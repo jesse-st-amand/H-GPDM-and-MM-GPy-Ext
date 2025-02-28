@@ -2,7 +2,7 @@ from functools import partial
 import numpy as np
 from itertools import product
 import random
-from model_comparison_core.compile_results_internal import CRI
+from model_comparison_core.model_results_processing.compile_results_Bayesian_MCCV import CRI
 from joblib import Parallel, delayed
 import copy
 import psutil
@@ -24,7 +24,7 @@ class func_simulator():
         np.random.seed(int(seed))
         # Set the Python random seed
         random.seed(int(seed))
-        print(f"Worker {worker_id} initialized with seed {seed}")
+        #print(f"Worker {worker_id} initialized with seed {seed}")
 
     def worker_wrapper(self, func, seed, variable_args):
         # Initialize worker with the provided seed

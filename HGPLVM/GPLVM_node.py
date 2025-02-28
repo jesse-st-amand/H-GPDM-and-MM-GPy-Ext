@@ -16,14 +16,14 @@ def print_current_seeds():
     numpy_state = np.random.get_state()
     python_state = random.getstate()
 
-    print(f"Current NumPy seed: {numpy_state[1][0]}")
-    print(f"Current Python random seed: {python_state[1]}")
+    #print(f"Current NumPy seed: {numpy_state[1][0]}")
+    #print(f"Current Python random seed: {python_state[1]}")
 
 def GPLVM_node(Y, attr_dict, **kwargs):
     if attr_dict['num_inducing_latent'] is None or attr_dict['num_inducing_latent'] == 0:
         num_inducing = None
         from HGPLVM.GPy_mods.models.gplvm import GPLVM as GPLVM_class
-    elif attr_dict['num_inducing_latent'] > 0: #and isinstance(num_inducing,int):
+    elif attr_dict['num_inducing_latent'] > 0: #and isinstance(num_inducing,int):   num_inducing = attr_dict['num_inducing_latent']
         from HGPLVM.GPy_mods.models.sparse_gplvm import SparseGPLVM as GPLVM_class
     else:
         raise ValueError('Model must either not have inducing variables, or include an integer number greater than 1.')
@@ -33,7 +33,7 @@ def GPLVM_node(Y, attr_dict, **kwargs):
         Establishes the GP node structure. Use with HGPLVM class for optimization
         """
 
-        def __init__(self, Y, attr_dict, input_dim=None, num_inducing=None, X=None, kernel=None, name="gplvm", variance=1,
+        def __init__(self, Y, attr_dict, input_dim=None, num_inducing_latent=None, X=None, kernel=None, name="gplvm", variance=1,
                      seq_eps=None, num_types_seqs=None,prior=None,backconstraint=None,**kwargs):
             self.attr_dict = attr_dict
             self.HGPLVM = None
@@ -62,13 +62,16 @@ def GPLVM_node(Y, attr_dict, **kwargs):
                 self.seq_x0s = np.concatenate([np.array([0]), (np.array(self.seq_eps) + 1)[:-1]])
             self.N, self.D = Y.shape[0], input_dim
 
-            if num_inducing is None or num_inducing == 0:
+            if num_inducing_latent is None or num_inducing_latent == 0:
                 self.num_inducing = None
                 super(GPLVMN, self).__init__(Y, input_dim, X = self.X, kernel=kernel)
             else:
-                self.num_inducing = int(num_inducing)
-                i = np.arange(0, self.N, int(self.N / self.num_inducing))
-                self.Z = self.X.view(np.ndarray)[i].copy()
+                self.num_inducing = int(num_inducing_latent)
+                #i = np.arange(0, self.N, int(self.N / self.num_inducing))
+                #self.Z = self.X.view(np.ndarray)[i].copy()
+                #i = np.random.permutation(self.N)[:min(self.num_inducing, self.N)]
+                #self.Z = self.X.view(np.ndarray)[i].copy()
+                self.Z = np.random.randn(self.num_inducing, self.D)
                 super(GPLVMN, self).__init__(Y, input_dim,  X = self.X, Z=self.Z, kernel=kernel, num_inducing=self.num_inducing)
 
         def init_embedding(self, embed_type, Y, input_dim = None):
@@ -203,7 +206,7 @@ def GPLVM_node(Y, attr_dict, **kwargs):
             if self.num_inducing is not None:
                 i = np.arange(0, self.N, int(np.round(self.N/self.num_inducing)))
                 Z = self.X.view(np.ndarray)[i].copy()
-
+                #Z = np.random.randn(self.num_inducing, self.D)
                 self.unlink_parameter(self.Z)
                 self.Z = Param('inducing inputs', Z)
                 self.link_parameter(self.Z,1)
@@ -240,7 +243,11 @@ def GPLVM_node(Y, attr_dict, **kwargs):
             elif BC_dict['type'].lower() == 'kernel geo':
                 from HGPLVM.backconstraints.geometric_BCs import Kernel_Geo_BC
                 self.backconstraint = Kernel_Geo_BC(BC_dict['geometry'], self, self.D, param_dict=BC_dict)
+            elif BC_dict['type'].lower() == 'kernel circular':
+                from HGPLVM.backconstraints.circular_kern_BC import Urtasun_Kernel_BC
+                self.backconstraint = Urtasun_Kernel_BC( self, self.D, param_dict=BC_dict)
             elif BC_dict['type'].lower() == 'mlp':
+
                 from HGPLVM.backconstraints.mlp_BC import MLP_BC
                 self.backconstraint = MLP_BC(self, self.D, param_dict=BC_dict)
             elif BC_dict['type'].lower() == 'mlp geo':
@@ -378,7 +385,7 @@ def GPLVM_node(Y, attr_dict, **kwargs):
             if self.mParent is None:
                 return 0
             else:
-                return -self.mParent.grad_dict['K_inv']@self.X
+                return -self.mParent.grad_dict['K_inv']@self.X.values
 
         def parameters_changed(self):
 

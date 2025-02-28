@@ -111,11 +111,11 @@ def write_results_to_csv(filename, result, comp_dict, data_dict, space_dict=None
         writer.writerow([])
 
         # Write second table with freeze metric
-        writer.writerow(['iteration', 'score', "loss", 'predicted classes', 'f1', 'smoothness', 'avg_freeze'])
-        for i, (score, iter, loss, pc, f1, smoothness, freeze) in enumerate(zip(result['fun'], result['iter'], 
+        writer.writerow(['iteration', 'score', "loss", 'predicted classes', 'f1', 'smoothness', 'avg_freeze', 'label'])
+        for i, (score, iter, loss, pc, f1, smoothness, freeze, label) in enumerate(zip(result['fun'], result['iter'], 
                                                     result['loss'], result['pred_classes'], result['f1'], 
-                                                    result['smoothness'], result['freeze'])):
-            writer.writerow([str(iter), score, loss, pc, f1, smoothness, freeze])
+                                                    result['smoothness'], result['freeze'], result['label'])):
+            writer.writerow([str(iter), score, loss, pc, f1, smoothness, freeze, label])
 def end_path_key_value(path_dict, writer, exclude_keys = []):
     if path_dict is None:
         return
@@ -145,7 +145,18 @@ def comp_func(data_set_class,  model_dict, seed=0, dict_index=0, fold_num=1, sav
         model.get_attribute_dict()
         data_set_class.store_HGP_attributes(model)
         print(model.get_attribute_dict())
-        score = model.score(iters=model.arch.model.learning_n, loss=model.arch.model.ObjFunVal)
+        #score = model.score(iters=model.arch.model.learning_n, loss=model.arch.model.ObjFunVal)
+        score = 0
+    elif new_model_dict['attr_dict']['model_type'].lower() == 'x1_h1_y1':
+        new_model_dict['attr_dict']['pred_seq_len'] = int(
+            new_model_dict['attr_dict']['seq_len'] * new_model_dict['attr_dict']['pred_seq_len_ratio'])
+        model = HGP(new_model_dict, data_set_class=data_set_class)
+        model.optimize(max_iters=new_model_dict['attr_dict']['max_iters'], optimizer=new_model_dict['arch_dict']['top_node_dict']['attr_dict']['opt'])
+        model.get_attribute_dict()
+        data_set_class.store_HGP_attributes(model)
+        print(model.get_attribute_dict())
+        #score = model.score(iters=model.arch.model.learning_n, loss=model.arch.model.ObjFunVal)
+        score = 0
     elif new_model_dict['attr_dict']['model_type'].lower() == 'vae':
         model = VAEModelWrapper(new_model_dict, data_set_class=data_set_class)
         score = model.optimize(num_epochs=model_dict['attr_dict']['num_epochs'])
@@ -171,7 +182,8 @@ def comp_func(data_set_class,  model_dict, seed=0, dict_index=0, fold_num=1, sav
         'pred_classes': model.arch.pred_classes,
         'f1': model.arch.f1_list,
         'smoothness': model.arch.smoothness_list,
-        'freeze': model.arch.freeze_list
+        'freeze': model.arch.freeze_list,
+        'label': model.arch.label_list
     }
 
 

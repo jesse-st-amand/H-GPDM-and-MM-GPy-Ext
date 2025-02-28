@@ -8,30 +8,40 @@ class Architecture_Base():
         else:
             self.attr_dict = {}
 
-    def get_results(self, **kwargs):
-        return self.data_set_class.get_results(['Y_pred_denorm_list', 'X_preds', 'X_inferences',
-                                                        'pred_trajs', 'pred_traj_lists', 'Y_train_denorm_list',
-                                                        'Y_test_denorm_list'],
-                                                       self.dynamics.predict_Ys_Xs, self.data_set_class.Y_test_list, init_t=self.attr_dict['init_t'], 
-                                                       seq_len=self.attr_dict['sub_seq_len'],pred_group=self.attr_dict['pred_group'],
-                                                       **kwargs)
     
-    def get_scores(self, true_sequences, pred_sequences, **kwargs):
+    def get_results(self, Y_list, label, **kwargs):
+        return self.data_set_class.get_results(['Y_pred_denorm_list_'+label, 'X_preds_'+label, 'X_inferences_'+label,
+                                                 'pred_trajs_'+label, 'pred_traj_lists_'+label, 'Y_train_denorm_list_'+label,
+                                                 'Y_test_denorm_list_'+label],
+                                                  self.dynamics.predict_Ys_Xs, Y_list, init_t=self.attr_dict['init_t'],
+                                                  seq_len=self.attr_dict['sub_seq_len'],pred_group=self.attr_dict['pred_group'],
+                                                  **kwargs)
+    
+    def get_scores(self, true_sequences, pred_sequences, label, action_IDs_true,**kwargs):
         return self.data_set_class.score(self.attr_dict['sub_seq_len'],
                                               self.attr_dict['scoring_method'], 
                                               true_sequences, pred_sequences,
-                                              self.data_set_class.action_IDs_test,
-                                              self.data_set_class.results_dict['pred_trajs'])
+                                              action_IDs_true,
+                                              self.data_set_class.results_dict['pred_trajs_'+label])
     
-    def get_class_preds(self):
-        return {'pred':self.data_set_class.results_dict['pred_trajs'],
-                                     'gt':self.data_set_class.action_IDs_test}
+    def get_class_preds(self,label,action_IDs):
+        return {'pred':self.data_set_class.results_dict['pred_trajs_'+label],
+                                      'gt':action_IDs}
     
-    def store_data(self, iteration, score_rate, log_likelihood):
+    def store_data(self, iteration, score_rate, log_likelihood, Y_true_list, Y_true_CCs, action_IDs_true, label):
         if score_rate == 0:
             pass
-        elif iteration % score_rate == 1 or iteration == 1:
-            self.score(iteration, log_likelihood)
+        elif iteration == 1:
+            pass
+        elif score_rate == 'max':
+            if iteration == self.attr_dict['max_iters']:
+                self.score(Y_true_list, Y_true_CCs, label, iteration, log_likelihood, action_IDs_true)
+        elif score_rate == 'min_max':
+            if iteration == self.attr_dict['max_iters'] or iteration == 2:
+                self.score(Y_true_list, Y_true_CCs, label, iteration, log_likelihood, action_IDs_true)
+        elif iteration % score_rate == 1 or iteration == 2:
+            self.score(Y_true_list, Y_true_CCs, label, iteration, log_likelihood, action_IDs_true)
+
 
 
 

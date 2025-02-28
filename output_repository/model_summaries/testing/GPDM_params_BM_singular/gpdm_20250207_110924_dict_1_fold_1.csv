@@ -1,0 +1,50 @@
+Parameter,Optimized Value
+model_type,gpdm
+pred_group,0
+seq_len,100
+pred_seq_len_ratio,0.4
+max_iters,100
+name,X1_Y1
+pred_group,0
+init_t,0
+sub_seq_len,40
+scoring_method,f1_frechet_ldj:ff
+max_iters,100
+score_rate,max
+input_dim,2
+init,PCA
+opt,lbfgsb
+max_iters,100
+GPNode_opt,False
+kernel,"  [1msum.            [0;0m  |                 value  |  constraints  |  priors
+  [1mrbf.variance    [0;0m  |   0.04961345910882274  |      +ve      |        
+  [1mrbf.lengthscale [0;0m  |                  (2,)  |      +ve      |        
+  [1mlinear.variances[0;0m  |                  (2,)  |      +ve      |        
+  [1mbias.variance   [0;0m  |  0.016337523761804588  |      +ve      |        "
+num_inducing_latent,0
+num_inducing_dynamics,0
+type,kernel circular
+geometry,none
+geo params,3
+num_epochs,100
+num_acts,5
+constraints-0,variance
+constraints-1,A
+constraints-2,R
+constraints-3,n
+constraints-4,r
+ARD,False
+mapping,GPLVM
+data_set_class,<DSCs.data_set_classes.Bimanual3D object at 0x000001AE5EB92930>
+X_init,
+name,GPDMM
+name,ff
+order,1
+actions,"[""box_lift"", ""box_turn_cw_forward"", ""box_lateral_left"", ""bread_cutting_right"", ""jar_opening_right_open""]"
+people,[1]
+
+--- ITERATION RESULTS ---
+
+iteration,score,loss,predicted classes,f1,smoothness,avg_freeze,label
+100,0.39658224077368864,74699.7086205223,"{'pred': [4, 2, 4, 4, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 4, 2, 4, 4, 4, 4], 'gt': [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4]}",0.38095238095238093,0.847253973156913,1.9698874535296078,validation
+100,0.4535008169921517,74699.7086205223,"{'pred': [2, 4, 4, 2, 1, 2, 0, 3, 2, 2, 2, 2, 2, 2, 2, 2, 3, 0, 2, 3, 4, 4, 4, 2, 4], 'gt': [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4]}",0.3565656565656566,0.8294955301646442,1.9289605750832612,test

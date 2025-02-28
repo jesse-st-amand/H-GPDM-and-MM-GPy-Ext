@@ -32,57 +32,6 @@ class DynamicsBase:
 
         return np.vstack(Y_pred_denorm_list), np.vstack(X_preds), X_inferences, score_value, pred_traj_lists, IFs
 
-
-    '''def score(self, Y_test_list, init_t=0, seq_len=10, **kwargs):
-        # Clear any existing results
-        self.arch.data_set_class.results_dict = {}
-
-        results = self.arch.data_set_class.get_results(['Y_pred_denorm_list', 'X_preds', 'X_inferences',
-                                                        'pred_trajs', 'pred_traj_lists', 'Y_train_denorm_list',
-                                                        'Y_test_denorm_list'],
-                                                       self.predict_Ys_Xs, Y_test_list, init_t=init_t, 
-                                                       seq_len=self.arch.attr_dict['sub_seq_len'],
-                                                       **kwargs)
-
-        # Update state variables
-        self.Y_test_CCs = self.arch.data_set_class.Y_test_CCs
-        self.Y_pred_CCs = self.arch.data_set_class.Y_pos_list_to_stick_dicts_CCs(results[0])
-
-        true_sequences = self.arch.data_set_class.CC_dict_list_to_CC_array_list_min_PV(self.Y_test_CCs)
-        pred_sequences = self.arch.data_set_class.CC_dict_list_to_CC_array_list_min_PV(self.Y_pred_CCs)
-
-        scores = self.arch.data_set_class.score(self.arch.attr_dict['sub_seq_len'],
-                                              self.arch.attr_dict['scoring_method'], 
-                                              true_sequences, pred_sequences,
-                                              self.arch.data_set_class.action_IDs_test,
-                                              self.arch.data_set_class.results_dict['pred_trajs'])
-
-        self.arch.pred_classes.append({'pred':self.arch.data_set_class.results_dict['pred_trajs'],
-                                     'gt':self.arch.data_set_class.action_IDs_test})
-        self.arch.f1_list.append(scores['f1'])
-        self.arch.score_list.append(scores['avg_norm_distance'])
-        self.arch.smoothness_list.append(scores['avg_norm_smoothness'])
-        self.arch.freeze_list.append(scores['avg_freeze'])
-        self.arch.iter_list.append(self.arch.model.learning_n)
-        self.arch.loss_list.append(self.arch.model.ObjFunVal)
-        
-        print('')
-        print('SCORES: ')
-        print('avg_norm_distance: ')
-        print(scores['avg_norm_distance'])
-        print('f1: ')
-        print(scores['f1'])
-        print('avg_norm_smoothness: ')
-        print(scores['avg_norm_smoothness'])
-        print('avg_freeze: ')
-        print(scores['avg_freeze'])
-
-        if scores['f1'] == 0:
-            f1_score = 0.01
-        else:
-            f1_score = scores['f1']
-        return scores['avg_norm_distance']'''
-
     def CCs_setup(self,Y_prediction_list):
         self.Y_test_CCs = self.arch.data_set_class.Y_test_CCs
         self.Y_train_CCs = self.arch.data_set_class.Y_train_CCs
