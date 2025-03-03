@@ -776,7 +776,28 @@ class DataSetClassMovementBase(DataSetClassSequencesBase):
                 X_pred=None, x_dim=0, y_dim=1, z_dim='time'):
         plt.figure()
         ax = plt.axes(projection='3d')
-        colors = ['r', 'g', 'c', 'm', 'y', 'k', 'b', 'w','r', 'g', 'c', 'm', 'y', 'k', 'b', 'w']
+        
+        # Generate a color map with enough distinct colors for all actions
+        import matplotlib.cm as cm
+        import matplotlib.colors as mcolors
+        
+        # Option 1: Use a colormap to generate unique colors
+        cmap = cm.get_cmap('tab20b', num_actions)  # tab20 provides 20 distinct colors
+        colors = [cmap(i) for i in range(num_actions)]
+        
+        # Option 2: If more than 20 colors are needed, combine multiple color maps
+        if num_actions > 20:
+            cmap1 = cm.get_cmap('tab20', 20)
+            cmap2 = cm.get_cmap('tab20b', 20)
+            cmap3 = cm.get_cmap('tab20c', 20)
+            colors = [cmap1(i % 20) if i < 20 else 
+                     (cmap2((i-20) % 20) if i < 40 else 
+                      cmap3((i-40) % 20)) for i in range(num_actions)]
+        
+        # Fall back to the original list if something goes wrong
+        if not colors or len(colors) < num_actions:
+            colors = ['r', 'g', 'c', 'm', 'y', 'k', 'b', 'w'] * ((num_actions // 8) + 1)
+        
         test_seq_num = 0
         for action_num in range(num_actions):
             color_val = colors[action_num]

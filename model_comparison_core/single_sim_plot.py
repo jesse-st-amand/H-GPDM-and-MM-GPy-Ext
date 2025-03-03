@@ -45,9 +45,10 @@ if __name__ == "__main__":
     parent_directory = os.path.dirname(current_directory)
     param_dir = 'testing'
     plot_animation = False
-    plot_latent = False
+    plot_latent = True
     names = [
-        'GPDM_params_BM_singular',
+        'GPDM_figure_BM',
+        #'GPDM_figure_CMU',
 
     ]
 
@@ -70,10 +71,15 @@ if __name__ == "__main__":
         if plot_animation == True:
             plot_model(model,[0,5,10,15,20])
 
+
         if plot_latent == True:
             ax1, fig1 = model.arch.data_set_class.plot_gs(model.arch.data_set_class.sub_num_actions, model.arch.data_set_class.num_test_seqs_per_subj_per_act,
                               model.arch.data_set_class.num_train_seqs_per_subj_per_act, X_latent=model.arch.model.top_node.X,
-                                          x_dim=0, y_dim=1, z_dim=3)
+                                          x_dim=0, y_dim=1, z_dim=2)
+            
+            ax2, fig2 = model.arch.data_set_class.plot_gs(model.arch.data_set_class.sub_num_actions, model.arch.data_set_class.num_test_seqs_per_subj_per_act,
+                              model.arch.data_set_class.num_train_seqs_per_subj_per_act, X_latent=model.arch.model.top_node.X,
+                                          x_dim=8, y_dim=9, z_dim=10)
 '''ax1, fig1 = model.arch.data_set_class.plot_gs(model.arch.data_set_class.sub_num_actions, model.arch.data_set_class.num_test_seqs_per_subj_per_act,
                               model.arch.data_set_class.num_train_seqs_per_subj_per_act, X_latent=model.arch.model.top_node.X,
                                           x_dim=0, y_dim=1, z_dim=2)
