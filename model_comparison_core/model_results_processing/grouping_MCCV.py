@@ -153,17 +153,20 @@ def process_file(filepath, target_iteration):
     return hyperparams, metrics
 
 def process_directory(directory_path, grouping_params):
+    """
+    Process all files in a directory and group them according to specified parameters.
+    Modified to match MCCV_analysis approach: each file uses its own best iteration.
+    """
     results = {}
     
-    # First pass: collect all files by group and find average best iteration
-    group_iterations = {}
+    # Process each file individually, finding the best iteration for each file
     for file in glob.glob(os.path.join(directory_path, '*.csv')):
         try:
             with open(file, 'r') as f:
                 content = f.read()
             first_table = pd.read_csv(io.StringIO(content.split('--- ITERATION RESULTS ---')[0]))
             
-            # Create group key based on specified hyperparameters
+            # Extract hyperparameters
             hyperparams = {row['Parameter']: try_float(row['Optimized Value']) 
                          for _, row in first_table.iterrows()}
             
@@ -223,95 +226,22 @@ def process_directory(directory_path, grouping_params):
             # Create group key using processed parameters
             group_key = tuple(hyperparams.get(param, None) for param in grouping_params)
             
-            if group_key not in group_iterations:
-                group_iterations[group_key] = []
-            
-            best_iter = find_best_iteration(file)
-            group_iterations[group_key].append(best_iter)
-            
-        except Exception as e:
-            print(f"Error in first pass processing {file}: {str(e)}")
-    
-    # Calculate average best iteration for each group
-    target_iterations = {group: int(np.mean(iters)) 
-                        for group, iters in group_iterations.items()}
-    
-    # Second pass: get test metrics using target iterations
-    for file in glob.glob(os.path.join(directory_path, '*.csv')):
-        try:
-            with open(file, 'r') as f:
-                content = f.read()
-            first_table = pd.read_csv(io.StringIO(content.split('--- ITERATION RESULTS ---')[0]))
-            
-            hyperparams = {row['Parameter']: try_float(row['Optimized Value']) 
-                         for _, row in first_table.iterrows()}
-            
-            # Process parameters that need special handling
-            processed_params = {}
-            
-            # First, handle constraints specially
-            if 'constraints' in grouping_params:
-                constraint_params = sorted(
-                    [p for p in hyperparams.keys() if p.startswith('constraints-')],
-                    key=lambda x: int(x.split('-')[1])
-                )
-                if constraint_params:
-                    combined_constraints = tuple(hyperparams[param] for param in constraint_params)
-                    processed_params['constraints'] = combined_constraints
-                    # Remove individual constraint parameters
-                    for p in constraint_params:
-                        hyperparams.pop(p, None)
-            
-            # Then handle other parameters
-            for param in grouping_params:
-                if param == 'constraints':
-                    continue  # Already handled above
-                
-                # Check if parameter has a numeric suffix
-                param_parts = param.rsplit('-', 1)
-                base_param = param_parts[0]
-                
-                # Get all matching parameters and their values in order of appearance
-                param_values = []
-                for _, row in first_table.iterrows():
-                    if row['Parameter'] == base_param:
-                        param_values.append(try_float(row['Optimized Value']))
-                
-                if len(param_parts) > 1:
-                    try:
-                        # If it's a numeric suffix, get the nth occurrence (0-based index)
-                        index = int(param_parts[1])
-                        if param_values:
-                            processed_params[param] = param_values[index]
-                    except ValueError:
-                        # If suffix is not numeric, treat as regular parameter
-                        if param in hyperparams:
-                            processed_params[param] = hyperparams[param]
-                else:
-                    # No suffix - handle potential duplicates
-                    if param_values:
-                        if len(param_values) == 1:
-                            processed_params[param] = param_values[0]
-                        else:
-                            # Multiple occurrences - combine into tuple preserving order
-                            processed_params[param] = tuple(param_values)
-            
-            # Update hyperparams with processed parameters
-            hyperparams.update(processed_params)
-            
-            group_key = tuple(hyperparams.get(param, None) for param in grouping_params)
-            
+            # Initialize group if not already present
             if group_key not in results:
                 results[group_key] = {
                     'hyperparams': hyperparams,
                     'folds': []
                 }
             
-            hyperparams, metrics = process_file(file, target_iterations[group_key])
+            # Find the best iteration for this specific file (not averaged across files)
+            best_iteration = find_best_iteration(file)
+            
+            # Process file with its own best iteration
+            file_hyperparams, metrics = process_file(file, best_iteration)
             results[group_key]['folds'].append(metrics)
             
         except Exception as e:
-            print(f"Error in second pass processing {file}: {str(e)}")
+            print(f"Error processing {file}: {str(e)}")
     
     return results
 
@@ -367,15 +297,15 @@ def save_results_to_csv(stats, output_file, grouping_params):
 
 def main():
     param_dir = 'intra_model'
-    sub_dir = 'inducing_inputs'  
+    sub_dir = 'geometries'  
     data_set = 'BM'
-    name = 'IIs_all'
+    name = 'geos_all'
     smoothness_metric = 'smoothness'
     models = [
         {
             'name': name+"_"+data_set,
             'model_summaries_sub_dir': param_dir+'/'+sub_dir+'/',
-            'grouping_params': ['input_dim','geometry',"geo params","num_inducing_latent","num_inducing_dynamics"]
+            'grouping_params': ['init','geometry',"geo params"]
         },
     ]
 

@@ -83,7 +83,7 @@ def process_file(filepath):
 def get_model_results(path):
     results = {}
     for file in glob.glob(os.path.join(path, '*.csv')):
-        sim_num = int(file.split('_')[-3].split('.')[0])
+        sim_num = int(file.split('_')[-1].split('.')[0])
         results[sim_num] = process_file(file)
     return results
 
