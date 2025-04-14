@@ -1,5 +1,5 @@
 
-# GPy Extension for Gaussian Process Dynamical Models
+# Hierarchical Gaussian Process Dynamical Model and Mixture Model GPy Extension
 
 An extension to the GPy library for Gaussian Process Dynamical Models (GPDMs) and hierarchical GPLVMs with a focus on human movement modeling.
 
