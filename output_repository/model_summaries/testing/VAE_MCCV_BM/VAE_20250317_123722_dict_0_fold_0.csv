@@ -1,0 +1,19 @@
+Parameter,Optimized Value
+model_type,VAE
+num_epochs,2
+model_type,VAE
+input_size,117
+num_classes,5
+hidden_size,692
+latent_size,5
+sample_len,40
+scoring_method,f1_frechet_ldj:ff
+score_rate,0
+init_t,0
+actions,"[""box_lift"", ""box_turn_cw_forward"", ""box_lateral_left"", ""bread_cutting_right"", ""jar_opening_right_open""]"
+people,[1]
+
+--- ITERATION RESULTS ---
+
+iteration,score,loss,predicted classes,f1,smoothness,avg_freeze,label
+2,0.454433488869132,59284.8359375,"[[1, 3, 1, 2, 1, 3, 1, 2, 4, 1, 4, 4, 1, 4, 4, 3, 2, 3, 3, 3, 4, 4, 2, 4, 4], [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4]]",0.3324675324675324,1.2806168152781041,3.227335626075443,test

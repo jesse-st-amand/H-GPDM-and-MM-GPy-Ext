@@ -10,6 +10,11 @@ from HGPLVM.GPLVM_node import GPLVM_node as GPNode
 #from HGPLVM.architectures.base import Architecture_Base
 from HGPLVM.architectures.base import HGP_arch
 import time
+from colorama import init
+from termcolor import colored
+
+# Initialize colorama for cross-platform colored terminal text
+init()
 
 class Architecture_Base():
     def __init__(self, arch_dict = {}, **kwargs):
@@ -207,6 +212,13 @@ class X1_H1_Y1(HGP_arch, Evaluation_Base):
         # Validate input dimensions
         if self.top_node_dict['attr_dict']['input_dim'] is None or self.H1_node_dict['attr_dict']['input_dim'] is None:
             raise ValueError('Input dimensions must be set before building this architecture.')
+        else:
+            print(colored("WARNING: Input dimensions of bottom layer = self.top_node_dict['attr_dict']['input_dim'] + self.H1_node_dict['attr_dict']['input_dim']", 'red'))
+            self.H1_node_dict['attr_dict']['input_dim'] = self.top_node_dict['attr_dict']['input_dim'] + self.H1_node_dict['attr_dict']['input_dim']
+
+        if self.top_node_dict['BC_dict']['geo params'] < 1:
+            print(colored("WARNING: Geometric parameters of top layer = self.top_node_dict['BC_dict']['geo params'] * self.top_node_dict['attr_dict']['input_dim']", 'red'))
+            self.top_node_dict['BC_dict']['geo params'] = int(self.top_node_dict['BC_dict']['geo params'] * self.top_node_dict['attr_dict']['input_dim'])
 
         # Set up kernels if not provided
         if self.H1_node_dict['attr_dict']['kernel'] is None:
@@ -452,6 +464,109 @@ class VAEMotionModel(nn.Module, Evaluation_Base, Architecture_Base):
         Y_pred_denorm_list = self.data_set_class.denorm_trajs(Y_preds_array, self.data_set_class.action_IDs_test)
         return Y_pred_denorm_list, pred_trajs_list, pred_trajs_list
 
+    def get_latent_space(self, data_list=None):
+        """
+        Extract latent space representations from the VAE encoder
+        
+        Parameters:
+        -----------
+        data_list : list, optional
+            List of data sequences to encode. If None, uses training data.
+            
+        Returns:
+        --------
+        latent_space : numpy.ndarray
+            Matrix of latent representations (N x latent_size)
+        """
+        self.eval()
+        with torch.no_grad():
+            if data_list is None:
+                # Use training data by default
+                X_seqs = torch.tensor(np.array(self.data_set_class.Y_train_list), dtype=torch.float32)
+            else:
+                X_seqs = torch.tensor(np.array(data_list), dtype=torch.float32)
+            
+            # Extract appropriate subsequences
+            X_sub_seqs = X_seqs[:, :self.sample_len, :]
+            
+            # Flatten each subsequence to feed into encoder
+            batch_size = X_sub_seqs.shape[0]
+            X_flat = X_sub_seqs.reshape(batch_size, -1).to(self.device)
+            
+            # Extract latent means (mu)
+            mu, _ = self.encode(X_flat)
+            
+            # Return as numpy array
+            return mu.cpu().numpy()
+    
+    def get_dynamic_latent_space(self, data_list=None, return_labels=True):
+        """
+        Create a visualization of the VAE's latent dynamics by encoding overlapping windows
+        to see how the latent representation changes as a sequence progresses
+        
+        Parameters:
+        -----------
+        data_list : list, optional
+            List of data sequences to encode. If None, uses training data.
+        return_labels : bool, optional
+            Whether to return action labels for each trajectory.
+            
+        Returns:
+        --------
+        trajectories : list of numpy.ndarray
+            Each element is a sequence's trajectory through latent space
+        labels : list, optional
+            Class/action labels for each trajectory (if return_labels=True)
+        """
+        self.eval()
+        with torch.no_grad():
+            if data_list is None:
+                # Use training data
+                data_list = self.data_set_class.Y_train_list
+                action_labels = self.data_set_class.action_IDs_train
+            else:
+                # Use provided data (assuming it's test data)
+                action_labels = self.data_set_class.action_IDs_test
+                
+            trajectories = []
+            trajectory_labels = []
+            
+            # Window size for sliding window (how many frames to encode at once)
+            window_size = self.sample_len
+            
+            for i, sequence in enumerate(data_list):
+                # Skip sequences that are too short
+                if len(sequence) < window_size:
+                    continue
+                
+                # For each position, encode a window of frames
+                latent_points = []
+                for t in range(len(sequence) - window_size + 1):
+                    window = sequence[t:t+window_size]
+                    
+                    # Convert to tensor and add batch dimension
+                    window_tensor = torch.tensor(window, dtype=torch.float32).unsqueeze(0).to(self.device)
+                    
+                    # Flatten
+                    window_flat = window_tensor.reshape(1, -1)
+                    
+                    # Encode to get latent representation
+                    mu, _ = self.encode(window_flat)
+                    
+                    # Store latent point
+                    latent_points.append(mu.cpu().numpy()[0])
+                
+                # Only include if we have latent points
+                if latent_points:
+                    # Store trajectory for this sequence
+                    trajectories.append(np.array(latent_points))
+                    trajectory_labels.append(action_labels[i])
+            
+            if return_labels:
+                return trajectories, trajectory_labels
+            else:
+                return trajectories
+
     @staticmethod
     def create_array_with_ones(shape, points):
         arr = np.zeros(shape)
@@ -630,6 +745,140 @@ class TransformerMotionModel(nn.Module, Evaluation_Base, Architecture_Base):
             IFs.append(self.data_set_class.IFs_func([Y_k_SD, Y_p_SD]))
         return IFs
 
+    def get_latent_space(self, data_list=None):
+        """
+        Extract latent space representations from the Transformer model
+        
+        Parameters:
+        -----------
+        data_list : list, optional
+            List of data sequences to encode. If None, uses training data.
+            
+        Returns:
+        --------
+        latent_space : numpy.ndarray
+            Matrix of latent representations (N x hidden_size)
+        """
+        self.eval()
+        with torch.no_grad():
+            if data_list is None:
+                # Use training data by default
+                X_seqs = torch.tensor(np.array(self.data_set_class.Y_train_list), dtype=torch.float32)
+            else:
+                X_seqs = torch.tensor(np.array(data_list), dtype=torch.float32)
+            
+            # Extract appropriate subsequences
+            X_sub_seqs = X_seqs[:, :self.sample_len, :].to(self.device)
+            
+            # Create attention mask
+            attention_mask = (X_sub_seqs != 0).any(dim=-1).float().to(self.device)
+            
+            # Get hidden states from the transformer
+            batch_size = X_sub_seqs.size(0)
+            x = self.input_projection(X_sub_seqs)
+            cls_tokens = self.cls_token.expand(batch_size, -1, -1)
+            x = torch.cat((cls_tokens, x), dim=1)
+            
+            if attention_mask is not None:
+                cls_attention = torch.ones((batch_size, 1), device=self.device)
+                attention_mask = torch.cat((cls_attention, attention_mask), dim=1)
+
+            seq_len = x.size(1)
+            position_ids = torch.arange(seq_len, dtype=torch.long, device=self.device).unsqueeze(0).expand(batch_size, -1)
+
+            transformer_output = self.transformer(inputs_embeds=x, attention_mask=attention_mask, position_ids=position_ids)
+            
+            # Use the [CLS] token representations as latent space
+            latent_representations = transformer_output.last_hidden_state[:, 0, :]
+            
+            # Return as numpy array
+            return latent_representations.cpu().numpy()
+
+    def get_dynamic_latent_space(self, data_list=None, return_labels=True):
+        """
+        Create a visualization of the Transformer's latent dynamics by encoding
+        sliding windows of the sequence and extracting the [CLS] token representation
+        
+        Parameters:
+        -----------
+        data_list : list, optional
+            List of data sequences to encode. If None, uses training data.
+        return_labels : bool, optional
+            Whether to return action labels for each trajectory.
+            
+        Returns:
+        --------
+        trajectories : list of numpy.ndarray
+            Each element is a sequence's trajectory through latent space
+        labels : list, optional
+            Class/action labels for each trajectory (if return_labels=True)
+        """
+        self.eval()
+        with torch.no_grad():
+            if data_list is None:
+                # Use training data
+                data_list = self.data_set_class.Y_train_list
+                action_labels = self.data_set_class.action_IDs_train
+            else:
+                # Use provided data (assuming it's test data)
+                action_labels = self.data_set_class.action_IDs_test
+                
+            trajectories = []
+            trajectory_labels = []
+            
+            # Window size for sliding window (how many frames to encode at once)
+            window_size = self.sample_len
+            
+            for i, sequence in enumerate(data_list):
+                # Skip sequences that are too short
+                if len(sequence) < window_size:
+                    continue
+                    
+                # For each position, encode a window of frames
+                latent_points = []
+                for t in range(len(sequence) - window_size + 1):
+                    window = sequence[t:t+window_size]
+                    
+                    # Convert to tensor and add batch dimension
+                    window_tensor = torch.tensor(window, dtype=torch.float32).unsqueeze(0).to(self.device)
+                    
+                    # Create attention mask
+                    attention_mask = (window_tensor != 0).any(dim=-1).float().to(self.device)
+                    
+                    # Get transformer output
+                    x = self.input_projection(window_tensor)
+                    cls_tokens = self.cls_token.expand(1, -1, -1)
+                    x = torch.cat((cls_tokens, x), dim=1)
+                    
+                    cls_attention = torch.ones((1, 1), device=self.device)
+                    full_attention_mask = torch.cat((cls_attention, attention_mask), dim=1)
+                    
+                    seq_len = x.size(1)
+                    position_ids = torch.arange(seq_len, dtype=torch.long, device=self.device).unsqueeze(0)
+                    
+                    transformer_output = self.transformer(
+                        inputs_embeds=x, 
+                        attention_mask=full_attention_mask, 
+                        position_ids=position_ids
+                    )
+                    
+                    # Extract [CLS] token representation
+                    cls_representation = transformer_output.last_hidden_state[:, 0, :]
+                    
+                    # Store latent point
+                    latent_points.append(cls_representation.cpu().numpy()[0])
+                
+                # Only include if we have latent points
+                if latent_points:
+                    # Store trajectory for this sequence
+                    trajectories.append(np.array(latent_points))
+                    trajectory_labels.append(action_labels[i])
+                
+            if return_labels:
+                return trajectories, trajectory_labels
+            else:
+                return trajectories
+
 
 class SequenceClassifier(nn.Module, Evaluation_Base, Architecture_Base):
     def __init__(self, wrapper, data_set_class, sample_len,input_size, num_classes, hidden_size=50, num_layers=2,
@@ -730,20 +979,6 @@ class SequenceClassifier(nn.Module, Evaluation_Base, Architecture_Base):
             self.store_data(epoch, score_rate, num_epochs, loss.item(), self.data_set_class.Y_test_list, self.data_set_class.Y_test_CCs, self.data_set_class.action_IDs_test,'test')
         return self.score(self.data_set_class.Y_test_list, self.data_set_class.Y_test_CCs, 'test', num_epochs, loss.item(), self.data_set_class.action_IDs_test,)
 
-    '''def predict_Ys_Xs(self, Y_test_list, init_t, seq_len=10, **kwargs):
-        num_seqs = len(Y_test_list)
-        X_seqs = torch.from_numpy(np.array(Y_test_list)).float().to(self.device)
-
-        pred_trajs, Y_preds = self.predict_and_generate(X_seqs)
-
-        # Move tensors to CPU and convert to numpy
-        Y_preds_list = [Y_pred.detach().cpu().numpy() for Y_pred in Y_preds]
-        pred_trajs = pred_trajs.cpu().numpy()
-        pred_trajs_list = [self.create_array_with_ones(self.num_classes, [pred_traj]) for pred_traj in pred_trajs]
-
-        Y_pred_denorm_list = self.data_set_class.denorm_trajs(Y_preds_list, self.data_set_class.action_IDs_test)
-        return Y_pred_denorm_list, pred_trajs, pred_trajs_list'''
-
     def predict_Ys_Xs(self, Y_test_list, init_t, seq_len=10, **kwargs):
         num_seqs = len(Y_test_list)
         X_seqs = torch.from_numpy(np.array(Y_test_list)).float().to(self.device)
@@ -782,3 +1017,119 @@ class SequenceClassifier(nn.Module, Evaluation_Base, Architecture_Base):
         for i, (Y_p_SD, Y_k_SD) in enumerate(zip(prediction, ground_truth)):
             IFs.append(self.data_set_class.IFs_func([Y_k_SD, Y_p_SD]))
         return IFs
+
+    def get_latent_space(self, data_list=None):
+        """
+        Extract latent space representations from the LSTM model
+        
+        Parameters:
+        -----------
+        data_list : list, optional
+            List of data sequences to encode. If None, uses training data.
+            
+        Returns:
+        --------
+        latent_space : numpy.ndarray
+            Matrix of latent representations (N x hidden_size)
+        """
+        self.eval()
+        with torch.no_grad():
+            if data_list is None:
+                # Use training data by default
+                num_seqs = len(self.data_set_class.Y_train_list)
+                max_seq_len = max(len(seq) for seq in self.data_set_class.Y_train_list)
+                X_seqs = np.zeros((num_seqs, max_seq_len, self.data_set_class.Y_train.shape[1]))
+                for i, Y_train in enumerate(self.data_set_class.Y_train_list):
+                    X_seqs[i, :len(Y_train), :] = Y_train
+            else:
+                num_seqs = len(data_list)
+                max_seq_len = max(len(seq) for seq in data_list)
+                X_seqs = np.zeros((num_seqs, max_seq_len, data_list[0].shape[1]))
+                for i, seq in enumerate(data_list):
+                    X_seqs[i, :len(seq), :] = seq
+            
+            # Convert to tensor and move to device
+            X_seqs_tensor = torch.from_numpy(X_seqs).float().to(self.device)
+            
+            # Extract appropriate subsequences
+            X_sub_seqs = X_seqs_tensor[:, :self.sample_len, :]
+            
+            # Pass through LSTM and get hidden state
+            lstm_out, (hn, cn) = self.lstm(X_sub_seqs)
+            
+            # Use the final hidden state as latent representation
+            # Take the last layer's hidden state for each sequence
+            latent_representations = hn[-1, :, :]
+            
+            # Return as numpy array
+            return latent_representations.cpu().numpy()
+
+    def get_dynamic_latent_space(self, data_list=None, return_labels=True):
+        """
+        Extract hidden state trajectories from the LSTM model for each sequence
+        
+        Parameters:
+        -----------
+        data_list : list, optional
+            List of data sequences to encode. If None, uses training data.
+        return_labels : bool, optional
+            Whether to return action labels for each trajectory.
+            
+        Returns:
+        --------
+        trajectories : list of numpy.ndarray
+            Each element is a sequence's trajectory through hidden space
+        labels : list, optional
+            Class/action labels for each trajectory (if return_labels=True)
+        """
+        self.eval()
+        with torch.no_grad():
+            if data_list is None:
+                # Use training data
+                data_list = self.data_set_class.Y_train_list
+                action_labels = self.data_set_class.action_IDs_train
+            else:
+                # Use provided data (assuming it's test data)
+                action_labels = self.data_set_class.action_IDs_test
+            
+            trajectories = []
+            trajectory_labels = []
+            
+            for i, sequence in enumerate(data_list):
+                # Skip if sequence is too short
+                if len(sequence) < 2:  # Need at least 2 time points to show a trajectory
+                    continue
+                    
+                # Convert to tensor and add batch dimension
+                seq_tensor = torch.tensor(sequence, dtype=torch.float32).unsqueeze(0).to(self.device)
+                
+                # Initialize hidden and cell states
+                batch_size = 1
+                h0 = torch.zeros(self.lstm.num_layers, batch_size, self.lstm.hidden_size).to(self.device)
+                c0 = torch.zeros(self.lstm.num_layers, batch_size, self.lstm.hidden_size).to(self.device)
+                
+                # Process each timestep and collect hidden states
+                hidden_states = []
+                for t in range(seq_tensor.size(1)):
+                    # Get single timestep
+                    x_t = seq_tensor[:, t:t+1, :]
+                    
+                    # Process through LSTM
+                    _, (h_t, c_t) = self.lstm(x_t, (h0, c0))
+                    
+                    # Store hidden state (using last layer)
+                    hidden_states.append(h_t[-1, 0].cpu().numpy())
+                    
+                    # Update hidden state for next timestep
+                    h0, c0 = h_t, c_t
+                
+                # Only include if we have hidden states
+                if hidden_states:
+                    # Store trajectory for this sequence
+                    trajectories.append(np.array(hidden_states))
+                    trajectory_labels.append(action_labels[i])
+            
+            if return_labels:
+                return trajectories, trajectory_labels
+            else:
+                return trajectories

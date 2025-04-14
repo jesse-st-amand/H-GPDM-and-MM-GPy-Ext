@@ -1,0 +1,20 @@
+Parameter,Optimized Value
+model_type,LSTM
+num_epochs,50
+model_type,LSTM
+input_size,77
+num_classes,8
+hidden_size,101
+num_layers,4
+sample_len,15
+scoring_method,f1_frechet_ldj:ff
+score_rate,0
+init_t,0
+actions,"[""bend_down"", ""soccer_kick"", ""breaststroke"", ""flystroke"", ""jump_side"", ""left_front_kick"", ""left_lunges"", ""left_punches""]"
+people,[0]
+
+--- ITERATION RESULTS ---
+
+iteration,score,loss,predicted classes,f1,smoothness,avg_freeze,label
+50,0.23188031446126978,0.3185669779777527,"[array([0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7,
+       7, 7], dtype=int64), [0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 7]]",1.0,0.8388540578116485,525.8521685771024,test

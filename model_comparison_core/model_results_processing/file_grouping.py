@@ -181,17 +181,17 @@ def copy_files_to_reorganized_dirs(directory_path, output_path, grouping_params)
 def main():
     global param_dir, save_dir
     
-    save_dir = 'temp'
+    save_dir = 'MCCV_ICANN'
     param_dir = 'intra_model'
-    sub_dir = 'geometries'  
-    data_set = 'BM'
-    name = 'geos_all'
+    sub_dir = 'hierarchies'  
+    data_set = 'CMU'
+    name = 'H1_all'
     smoothness_metric = 'smoothness'  # Kept for compatibility
     models = [
         {
             'name': name+"_"+data_set,
             'model_summaries_sub_dir': param_dir+'/'+sub_dir+'/',
-            'grouping_params': ['init','geometry',"geo params"]
+            'grouping_params': ['input_dim',"geo params"]
         },
     ]
 

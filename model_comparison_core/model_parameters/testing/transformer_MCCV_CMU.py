@@ -16,13 +16,13 @@ num_layers = 2
 num_heads = 11
 dropout = .3
 num_epochs = 100
-num_folds = 50
+num_folds = 1
 fold_start = 0
-fold_end = 50
+fold_end = 1
 fold_list = list(np.arange(fold_start,fold_end,1))
 fold_num = tuple(fold_list)
 scoring_method = 'f1_frechet_ldj:ff'
-score_rate = int(num_epochs*.1)
+score_rate = 0
 init_t = 0
 ##
 

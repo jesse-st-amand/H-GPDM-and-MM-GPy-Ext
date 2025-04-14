@@ -1,0 +1,24 @@
+% Requires: \usepackage{booktabs}
+
+\begin{table}[ht]
+\caption{Model Comparisons for MCCV Analysis}
+\label{tab:model-comparison}
+\centering
+\tiny
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|r|r|r|r|r|}
+\toprule
+\textbf{Model} & \textbf{F1} & \textbf{Distance} & \textbf{Dampening} & \textbf{LDJ} & \textbf{Distance*Dampening/F1} \\
+\midrule
+GPDM geo 11 MCCV BM & \textbf{0.93} & \textbf{0.15} & \textbf{1.1} & \textbf{0.95} & 0.177 \\
+GPDM MCCV BM & \textbf{0.92} & \textbf{0.15} & \textbf{1.14} & 0.92$^{*}$ & 0.186 \\
+GPDM geo 10 MCCV BM & 0.91$^{*}$ & \textbf{0.16} & \textbf{1.12} & 0.94$^{*}$ & 0.197 \\
+GPDM 50 MCCV BM & \textbf{0.93} & 0.18$^{*}$ & 1.38$^{*}$ & 0.84$^{*}$ & 0.267 \\
+VAE MCCV BM & 0.87$^{*}$ & 0.19$^{*}$ & 1.33$^{*}$ & 1.26$^{*}$ & 0.290 \\
+GPDM 50 50 MCCV BM & \textbf{0.94} & 0.19$^{*}$ & 1.88$^{*}$ & 0.81$^{*}$ & 0.380 \\
+transformer MCCV BM & 0.9$^{*}$ & 0.36$^{*}$ & 3.32$^{*}$ & 0.85$^{*}$ & 1.328 \\
+RNN MCCV BM & 0.53$^{*}$ & 0.29$^{*}$ & \textbf{345.21} & 0.82$^{*}$ & 188.888 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}

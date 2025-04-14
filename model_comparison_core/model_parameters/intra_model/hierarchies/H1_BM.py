@@ -13,7 +13,6 @@ space = None
 data_set_name = 'Bimanual 3D'
 ##
 people = [0]
-input_dim = 15
 max_iters = 100
 num_folds = 10
 fold_start = 0
@@ -27,6 +26,7 @@ score_rate = int(max_iters*.1)
 ##
 
 init1 = 'kernel pca:rbf'
+input_dim = 15
 bc_name = 'map geo'#, 'multi w GP geo')
 geometry = 'fourier_basis'
 geo_params = 10
@@ -36,7 +36,7 @@ mapping = 'GPLVM'
 pred_group = 0
 
 init2 = 'kernel pca:rbf'
-input_dim2 = tuple(np.arange(input_dim+1,input_dim+20,1))
+input_dim2 = tuple(np.arange(1,20,1)) # added to input dim
 bc_name2 = 'none'
 geometry2 = 'none'
 geo_params2 = 0

@@ -1,0 +1,23 @@
+% Requires: \usepackage{booktabs}
+
+\begin{table}[ht]
+\caption{MCCV Analysis Results (20250311_150322)}
+\label{tab:mccv-analysis-20250311_150322}
+\centering
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|r|r|r|r|r|}
+\toprule
+\textbf{Model} & \textbf{F1} & \textbf{Distance} & \textbf{Dampening} & \textbf{LDJ} & \textbf{Distance*Dampening/F1} \\
+\midrule
+GPDM geo 4 MCCV CMU & \textbf{1.0} & \textbf{0.108} & \textbf{1.032} & 0.77$^{*}$ & 0.111 \\
+GPDM MCCV CMU & \textbf{1.0} & \textbf{0.109} & \textbf{1.04} & 0.788$^{*}$ & 0.113 \\
+GPDM 50 MCCV CMU & \textbf{1.0} & 0.113$^{*}$ & 1.109$^{*}$ & 0.746$^{*}$ & 0.125 \\
+GPDM 50 50 MCCV CMU & \textbf{1.0} & 0.113$^{*}$ & 1.145$^{*}$ & 0.726$^{*}$ & 0.129 \\
+VAE MCCV CMU & \textbf{1.0} & 0.131$^{*}$ & \textbf{1.037} & 1.228$^{*}$ & 0.136 \\
+transformer MCCV CMU & 0.944$^{*}$ & 0.254$^{*}$ & 4.642$^{*}$ & 0.761$^{*}$ & 1.249 \\
+RNN MCCV CMU & 0.871$^{*}$ & 0.206$^{*}$ & 548.459$^{*}$ & \textbf{0.886} & 129.716 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}

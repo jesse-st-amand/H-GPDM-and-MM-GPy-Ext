@@ -1,0 +1,20 @@
+Parameter,Optimized Value
+model_type,LSTM
+num_epochs,2
+model_type,LSTM
+input_size,117
+num_classes,5
+hidden_size,114
+num_layers,2
+sample_len,40
+scoring_method,f1_frechet_ldj:ff
+score_rate,0
+init_t,0
+actions,"[""box_lift"", ""box_turn_cw_forward"", ""box_lateral_left"", ""bread_cutting_right"", ""jar_opening_right_open""]"
+people,[1]
+
+--- ITERATION RESULTS ---
+
+iteration,score,loss,predicted classes,f1,smoothness,avg_freeze,label
+2,0.2947658940842147,2.561845064163208,"[array([2, 1, 0, 0, 2, 0, 4, 0, 1, 4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+       2, 2, 2], dtype=int64), [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4]]",0.23694083694083695,0.8553067451774258,9578.574376681807,test

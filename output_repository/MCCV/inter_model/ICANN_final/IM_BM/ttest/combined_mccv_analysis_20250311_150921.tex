@@ -1,0 +1,21 @@
+% Requires: \usepackage{booktabs}
+
+\begin{table}[ht]
+\caption{MCCV Analysis Results (20250311_150921)}
+\label{tab:mccv-analysis-20250311_150921}
+\centering
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|r|r|r|r|r|}
+\toprule
+\textbf{Model} & \textbf{F1} & \textbf{Distance} & \textbf{Dampening} & \textbf{LDJ} & \textbf{Distance*Dampening/F1} \\
+\midrule
+GPDM MCCV BM & \textbf{0.93} & \textbf{0.155} & \textbf{1.101} & \textbf{0.945} & 0.183 \\
+VAE MCCV BM & 0.874$^{*}$ & 0.189$^{*}$ & 1.328$^{*}$ & 1.262$^{*}$ & 0.287 \\
+GPDM 50 50 MCCV BM & \textbf{0.936} & 0.191$^{*}$ & 1.882$^{*}$ & 0.807$^{*}$ & 0.384 \\
+transformer MCCV BM & 0.903$^{*}$ & 0.356$^{*}$ & 3.318$^{*}$ & 0.854$^{*}$ & 1.308 \\
+RNN MCCV BM & 0.534$^{*}$ & 0.292$^{*}$ & \textbf{345.211} & 0.818$^{*}$ & 188.767 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}

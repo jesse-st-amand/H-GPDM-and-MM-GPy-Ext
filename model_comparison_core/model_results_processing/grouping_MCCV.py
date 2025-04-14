@@ -297,15 +297,15 @@ def save_results_to_csv(stats, output_file, grouping_params):
 
 def main():
     param_dir = 'intra_model'
-    sub_dir = 'geometries'  
+    sub_dir = 'hierarchies'  
     data_set = 'BM'
-    name = 'geos_all'
+    name = 'H1'
     smoothness_metric = 'smoothness'
     models = [
         {
             'name': name+"_"+data_set,
             'model_summaries_sub_dir': param_dir+'/'+sub_dir+'/',
-            'grouping_params': ['init','geometry',"geo params"]
+            'grouping_params': ["init","input_dim","geometry","geo params"]
         },
     ]
 

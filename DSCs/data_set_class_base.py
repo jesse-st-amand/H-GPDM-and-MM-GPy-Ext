@@ -783,8 +783,8 @@ class DataSetClassMovementBase(DataSetClassSequencesBase):
         
         # Option 1: Use a colormap to generate unique colors
         cmap = cm.get_cmap('tab20b', num_actions)  # tab20 provides 20 distinct colors
-        colors = [cmap(i) for i in range(num_actions)]
-        
+        #colors = [cmap(i) for i in range(num_actions)]
+        colors = ['r', 'g', 'c', 'm', 'y', 'k', 'b', 'w'] * ((num_actions // 8) + 1)
         # Option 2: If more than 20 colors are needed, combine multiple color maps
         if num_actions > 20:
             cmap1 = cm.get_cmap('tab20', 20)

@@ -48,11 +48,18 @@ def calculate_freeze_metric(prediction, ground_truth):
         n_samples = len(sequence)
         net_velocities = []
         
-        for i in range(0, n_samples - window_size):
+        '''for i in range(0, n_samples - window_size):
             # Sum up all the small movements within the window
             movements = sequence[i+1:i+window_size+1] - sequence[i:i+window_size]
             # Get the total displacement magnitude over the window
             total_movement = np.linalg.norm(np.sum(movements, axis=0))
+            net_velocities.append(total_movement)'''
+
+        for i in range(0, n_samples - window_size):
+            # Sum up all the small movements within the window
+            movements = sequence[i+window_size] - sequence[i]
+            # Get the total displacement magnitude over the window
+            total_movement = np.linalg.norm(movements)
             net_velocities.append(total_movement)
             
         return np.array(net_velocities)

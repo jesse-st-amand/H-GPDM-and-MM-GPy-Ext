@@ -1,8 +1,6 @@
-
 import os
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 import psutil
 import pickle
 from joblib import Parallel, delayed
@@ -75,11 +73,13 @@ if __name__ == "__main__":
     current_directory = os.path.dirname(os.path.abspath(__file__))
     parent_directory = os.path.dirname(current_directory)
 
-    param_dir = 'inter_model'
-    sub_dir = 'ICANN'  
+    param_dir = 'intra_model'
+    sub_dir = 'order_1_2'  
     temp = False
     names = [
-        'GPDM_geo_8_MCCV_BM',
+        'order_1_vs_2_best_BM',
+        'order_1_vs_2_best_CMU',
+        
     ]
 
     for name in names:

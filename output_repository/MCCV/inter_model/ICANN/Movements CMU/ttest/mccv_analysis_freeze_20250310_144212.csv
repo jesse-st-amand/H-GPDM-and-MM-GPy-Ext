@@ -1,0 +1,8 @@
+Model,Mean,Std Dev,Difference,Statistic,p-value
+GPDM_MCCV_CMU,,,-,-,-
+GPDM_geo_4_MCCV_CMU,,,,,
+GPDM_50_MCCV_CMU,,,,,
+GPDM_50_50_MCCV_CMU,,,,,
+RNN_MCCV_CMU,,,,,
+transformer_MCCV_CMU,,,,,
+VAE_MCCV_CMU,,,,,

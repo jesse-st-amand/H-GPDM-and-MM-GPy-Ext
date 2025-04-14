@@ -15,6 +15,7 @@ dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))
 # Example usage
 control_path = dir+r"\output_repository\model_summaries\\" + param_dir + r"\\" + sub_dir + r"\GPDM_MCCV_"+data_set_init
 test_paths = [
+   dir+r"\output_repository\model_summaries\\" + param_dir + r"\\" + sub_dir +  r"\GPDM_geo_4_MCCV_"+data_set_init,
     dir+r"\output_repository\model_summaries\\" + param_dir + r"\\" + sub_dir +  r"\GPDM_50_MCCV_"+data_set_init,
     dir+r"\output_repository\model_summaries\\" + param_dir + r"\\" + sub_dir +  r"\GPDM_50_50_MCCV_"+data_set_init,
     dir+r"\output_repository\model_summaries\\" + param_dir + r"\\" + sub_dir + r"\RNN_MCCV_"+data_set_init,

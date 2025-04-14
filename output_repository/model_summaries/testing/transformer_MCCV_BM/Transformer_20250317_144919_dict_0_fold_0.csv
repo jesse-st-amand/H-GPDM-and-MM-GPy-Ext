@@ -1,0 +1,23 @@
+Parameter,Optimized Value
+model_type,Transformer
+num_epochs,2
+model_type,Transformer
+input_size,117
+num_classes,5
+hidden_size_multiplier,35
+num_layers,2
+num_heads,13
+dropout,0.3
+max_seq_length,100
+sample_len,40
+scoring_method,f1_frechet_ldj:ff
+score_rate,0
+init_t,0
+actions,"[""box_lift"", ""box_turn_cw_forward"", ""box_lateral_left"", ""bread_cutting_right"", ""jar_opening_right_open""]"
+people,[1]
+
+--- ITERATION RESULTS ---
+
+iteration,score,loss,predicted classes,f1,smoothness,avg_freeze,label
+2,0.3622735632341457,1.9668166637420654,"[array([0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3,
+       2, 3, 2], dtype=int64), [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4]]",0.6371794871794872,1.061699437055294,12.56735899876173,test
